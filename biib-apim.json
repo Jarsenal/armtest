@@ -1,0 +1,463 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"api_service_create_flag":{
+			"defaultValue": "no",
+			"type": "String",
+			"allowedValues": [
+				"yes",
+				"no"
+			]
+		},
+		"api_service_name": {
+			"type": "String"
+		},
+		"api_service_rg": {
+			"type": "String"
+		},
+		"api_service_location": {
+			"type": "String"
+		},
+		"api_service_sku": {
+			"defaultValue": "Developer",
+			"allowedValues": [
+				"Developer",
+				"Basic",
+				"Standard",
+				"Premium"
+			],
+			"type": "String"
+		},
+		"api_service_vnet":{
+			"defaultValue":"api",
+			"type":"String"
+		},
+		"api_service_subnet":{
+			"defaultValue":"api",
+			"type":"String"
+		},
+		"api_service_publisher": {
+			"defaultValue": "TCCC POC",
+			"type": "String"
+		},
+		"api_service_publisher-email": {
+			"type": "String"
+		},
+		"apis_basepath":{
+			"type":"string",
+			"defaultValue":"public/bib"
+		},
+		"biib_rg":{
+			"type":"String"
+		},
+		"func_biibui": {
+			"defaultValue": "asfa-icoe-bib-poc-biibui",
+			"type": "String"
+		},
+		"func_logging": {
+			"defaultValue": "asfa-icoe-bib-poc-logging",
+			"type": "String"
+		},
+		"func_mapping": {
+			"defaultValue": "asfa-icoe-bib-poc-mapping",
+			"type": "String"
+		},
+		"logic-main":{
+			"defaultValue":"la-icoe-bib-poc-source_http_queue",
+			"type":"String"
+			
+		},
+		"logic-critical":{
+			"defaultValue":"la-icoe-bib-poc-source_http_critical",
+			"type":"String"
+			
+		},
+		"logic-stream":{
+			"defaultValue":"la-icoe-bib-poc-source_http_stream",
+			"type":"String"
+			
+		}
+	},
+	"variables": {
+		"uioperations":[
+			{
+				"app":"[parameters('func_biibui')]",
+				"function":"EventsConfigRetrieve",
+				"method":"GET",
+				"path":"/configs/events"
+			},
+			{
+				"app":"[parameters('func_biibui')]",
+				"function":"EventsConfigStore",
+				"method":"POST",
+				"path":"/configs/events"
+			},
+			{
+				"app":"[parameters('func_biibui')]",
+				"function":"MQEventsConfigRetrieve",
+				"method":"GET",
+				"path":"/configs/mqevents"
+			},
+			{
+				"app":"[parameters('func_biibui')]",
+				"function":"MQEventsConfigStore",
+				"method":"POST",
+				"path":"/configs/mqevents"
+			},
+			{
+				"app":"[parameters('func_biibui')]",
+				"function":"MappingConfigRetrieve",
+				"method":"GET",
+				"path":"/configs/mappings/*"
+			},
+			{
+				"app":"[parameters('func_biibui')]",
+				"function":"MappingConfigStore",
+				"method":"POST",
+				"path":"/configs/mappings/*"
+			},
+			{
+				"app":"[parameters('func_biibui')]",
+				"function":"RoutingConfigRetrieve",
+				"method":"GET",
+				"path":"/configs/routings/*"
+			},
+			{
+				"app":"[parameters('func_biibui')]",
+				"function":"RoutingConfigStore",
+				"method":"POST",
+				"path":"/configs/routings/*"
+			},
+			{
+				"app":"[parameters('func_mapping')]",
+				"function":"RunMappingTest",
+				"method":"POST",
+				"path":"/process/mappings"
+			},
+			{
+				"app":"[parameters('func_logging')]",
+				"function":"Logger-Extract",
+				"method":"GET",
+				"path":"/transactions/list"
+			},
+			{
+				"app":"[parameters('func_logging')]",
+				"function":"Event-Count-Extract",
+				"method":"GET",
+				"path":"/transactions/eventcount"
+			},
+			{
+				"app":"[parameters('func_logging')]",
+				"function":"Logger-Extract-Transaction",
+				"method":"GET",
+				"path":"/transactions/transaction"
+			},
+			{
+				"app":"[parameters('func_logging')]",
+				"function":"Reprocess-Job",
+				"method":"POST",
+				"path":"/transactions/reprocess"
+			},
+			{
+				"app":"[parameters('func_logging')]",
+				"function":"Find-Source-Event",
+				"method":"POST",
+				"path":"/transactions/findsource"
+			},
+			{
+				"app":"[parameters('func_logging')]",
+				"function":"Get-Payload",
+				"method":"GET",
+				"path":"/transactions/payload"
+			},
+			{
+				"app":"[parameters('func_logging')]",
+				"function":"Logger-Extract-Transaction-Attribute",
+				"method":"GET",
+				"path":"/transactions/attributesearch"
+			}
+		],
+		"LogicResources": [
+			{
+				"name":"[parameters('logic-main')]",
+				"id":"[resourceId(parameters('biib_rg'),'Microsoft.Logic/workflows/triggers', parameters('logic-main'), 'manual')]",
+				"path":"batch"
+			},
+			{
+				"name":"[parameters('logic-critical')]",
+				"id":"[resourceId(parameters('biib_rg'), 'Microsoft.Logic/workflows/triggers', parameters('logic-critical'), 'manual')]",
+				"path":"critical"
+			},
+			{
+				"name":"[parameters('logic-stream')]",
+				"id":"[resourceId(parameters('biib_rg'), 'Microsoft.Logic/workflows/triggers', parameters('logic-stream'), 'manual')]",
+				"path":"stream"
+			}
+		],
+		"apiVersion": "2019-05-01"
+	},
+	"resources": [
+		{
+			"type": "Microsoft.ApiManagement/service/products",
+			"apiVersion": "2019-01-01",
+			"name": "[concat(parameters('api_service_name'), '/biibui')]",
+			"properties": {
+				"displayName": "BiiB UI",
+				"description": "BiiB UI Subscriber to give access to API",
+				"subscriptionRequired": true,
+				"approvalRequired": true,
+				"subscriptionsLimit": 1,
+				"state": "published"
+			}
+		},
+		{
+			"type": "Microsoft.ApiManagement/service/products",
+			"apiVersion": "2019-01-01",
+			"name": "[concat(parameters('api_service_name'), '/biibingest')]",
+			"properties": {
+				"displayName": "BiiB Ingest",
+				"description": "BiiB Ingest Subscriber to give access to API",
+				"subscriptionRequired": true,
+				"approvalRequired": true,
+				"subscriptionsLimit": 1,
+				"state": "published"
+			}
+		},
+		{
+			"type": "Microsoft.ApiManagement/service/apis",
+			"apiVersion": "2019-01-01",
+			"name": "[concat(parameters('api_service_name'), '/biib-ui')]",
+			"properties": {
+				"displayName": "BiiB UI",
+				"apiRevision": "1",
+				"description": "Import from \"biibui\" Function App",
+				"path": "[concat(parameters('apis_basepath'),'/ui')]",
+				"protocols": [
+					"https"
+				],
+				"isCurrent": true,
+				"subscriptionKeyParameterNames": {
+				  "header": "apim-code",
+				  "query": "code"
+				}
+			}
+		},
+		{
+            "type": "Microsoft.ApiManagement/service/apis/policies",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(parameters('api_service_name'), '/biib-ui/policy')]",
+            "dependsOn": [
+                "[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/apis', parameters('api_service_name'), 'biib-ui')]"
+            ],
+            "properties": {
+                "value": "<!--\r\n    IMPORTANT:\r\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\r\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\r\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\r\n    - To add a policy, place the cursor at the desired insertion point and select a policy from the sidebar.\r\n    - To remove a policy, delete the corresponding policy statement from the policy document.\r\n    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.\r\n    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.\r\n    - Policies are applied in the order of their appearance, from the top down.\r\n    - Comments within policy elements are not supported and may disappear. Place your comments between policy elements or at a higher level scope.\r\n-->\r\n<policies>\r\n  <inbound>\r\n    <base />\r\n    <cors>\r\n      <allowed-origins>\r\n        <origin>*</origin>\r\n      </allowed-origins>\r\n      <allowed-methods>\r\n        <method>*</method>\r\n      </allowed-methods>\r\n      <allowed-headers>\r\n        <header>*</header>\r\n      </allowed-headers>\r\n      <expose-headers>\r\n        <header>*</header>\r\n      </expose-headers>\r\n    </cors>\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>",
+                "format": "xml"
+            }
+        },
+		{
+            "type": "Microsoft.ApiManagement/service/apis",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(parameters('api_service_name'), '/biib-ingest')]",
+            "properties": {
+                "displayName": "BiiB Ingest",
+                "apiRevision": "1",
+                "description": "Ingest for BiiB",
+                "protocols": [
+                    "https"
+                ],
+                "isCurrent": true,
+				"path": "[concat(parameters('apis_basepath'),'/ingest')]"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/apis",
+            "name": "[concat(parameters('api_service_name'), '/biibui/biib-ui')]",
+            "apiVersion": "2017-03-01",
+            "scale": null,
+            "properties": {
+				"displayName": "BIIB UI"
+			},
+            "dependsOn": [
+				"[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/products', parameters('api_service_name'), 'biibui')]",
+                "[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/apis', parameters('api_service_name'), 'biib-ui')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products/apis",
+            "name": "[concat(parameters('api_service_name'), '/biibingest/biib-ingest')]",
+            "apiVersion": "2017-03-01",
+            "scale": null,
+            "properties": {
+				"displayName": "BIIB Ingest"
+			},
+            "dependsOn": [
+                "[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/products', parameters('api_service_name'), 'biibingest')]",
+                "[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/apis', parameters('api_service_name'), 'biib-ingest')]"
+            ]
+        },
+		{
+			"type": "Microsoft.ApiManagement/service/policies",
+			"apiVersion": "2019-01-01",
+			"name": "[concat(parameters('api_service_name'), '/policy')]",
+			"properties": {
+				"value": "<!--\r\n    IMPORTANT:\r\n    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.\r\n    - Only the <forward-request> policy element can appear within the <backend> section element.\r\n    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.\r\n    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.\r\n    - To add a policy position the cursor at the desired insertion point and click on the round button associated with the policy.\r\n    - To remove a policy, delete the corresponding policy statement from the policy document.\r\n    - Policies are applied in the order of their appearance, from the top down.\r\n-->\r\n<policies>\r\n  <inbound />\r\n  <backend>\r\n    <forward-request />\r\n  </backend>\r\n  <outbound />\r\n</policies>",
+				"format": "xml"
+			}
+		},
+		{
+			"type": "Microsoft.ApiManagement/service/backends",
+			"apiVersion": "2019-01-01",
+			"name": "[concat(parameters('api_service_name'),'/',variables('uioperations')[copyindex()]['app'],variables('uioperations')[copyindex()]['function'])]",
+			"dependsOn": [
+				"[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/properties', parameters('api_service_name'),concat(variables('uioperations')[copyindex()]['function'],'-biibui-key'))]"
+			],
+			"properties": {
+				"description": "[concat(variables('uioperations')[copyindex()]['app'],'-',variables('uioperations')[copyindex()]['function'])]",
+				"url": "[concat('https://',variables('uioperations')[copyindex()]['app'] ,'.azurewebsites.net/api')]",
+				"protocol": "http",
+				"resourceId": "[concat('https://management.azure.com/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('biib_rg'), '/providers/Microsoft.Web/sites/', variables('uioperations')[copyindex()]['app'])]",
+				"credentials": {
+					"header": {
+						"x-functions-key": [
+							"[concat('{{',variables('uioperations')[copyindex()]['function'],'-biibui-key','}}')]"
+						]
+					}
+				}
+			},
+			"copy": {
+				"name": "copy",
+				"count": "[length(variables('uioperations'))]"
+			}
+		},
+		{
+            "type": "Microsoft.ApiManagement/service/properties",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(parameters('api_service_name'),'/',variables('uioperations')[copyindex()]['function'],'-biibui-key')]",
+            "properties": {
+                "displayName": "[concat(variables('uioperations')[copyindex()]['function'],'-biibui-key')]",
+                "value": "[listKeys(resourceId(parameters('biib_rg'),'Microsoft.Web/sites/functions',variables('uioperations')[copyindex()]['app'],variables('uioperations')[copyindex()]['function']),'2019-08-01').default]",
+                "tags": [
+                    "key",
+                    "function",
+                    "auto",
+					"biib"
+                ],
+                "secret": true
+            },
+			"copy": {
+				"name": "copy",
+				"count": "[length(variables('uioperations'))]"
+			}
+        },
+		{
+			"type": "Microsoft.ApiManagement/service/apis/operations",
+			"apiVersion": "2019-01-01",
+			"name": "[concat(parameters('api_service_name'), '/biib-ui/', variables('uioperations')[copyindex()]['function'])]",
+			"dependsOn": [
+				"[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/apis', parameters('api_service_name'), 'biib-ui')]"
+			],
+			"properties": {
+				"displayName": "[variables('uioperations')[copyindex()]['function']]",
+				"method": "[variables('uioperations')[copyindex()]['method']]",
+				"urlTemplate": "[variables('uioperations')[copyindex()]['path']]",
+				"templateParameters": [],
+				"responses": []
+			},
+			"copy": {
+				"name": "copy",
+				"count": "[length(variables('uioperations'))]"
+			}
+		},
+		{
+			"type": "Microsoft.ApiManagement/service/apis/operations/policies",
+			"apiVersion": "2019-01-01",
+			"name": "[concat(parameters('api_service_name'), '/biib-ui/',variables('uioperations')[copyindex()]['function'],'/policy')]",
+			"dependsOn": [
+				"[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/apis/operations', parameters('api_service_name'), 'biib-ui', variables('uioperations')[copyindex()]['function'])]",
+				"[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/apis', parameters('api_service_name'), 'biib-ui')]",
+				"[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/backends', parameters('api_service_name'), concat(variables('uioperations')[copyindex()]['app'],variables('uioperations')[copyindex()]['function']))]"
+
+			],
+			"properties": {
+				"value": "[concat('<policies>\r\n  <inbound>\r\n    <base />\r\n    <set-backend-service id=\"apim-generated-policy\" backend-id=\"',variables('uioperations')[copyindex()]['app'],variables('uioperations')[copyindex()]['function'],'\" />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>')]",
+				"format": "xml"
+			},
+			"copy": {
+				"name": "copy",
+				"count": "[length(variables('uioperations'))]"
+			}
+		},
+        {
+            "type": "Microsoft.ApiManagement/service/apis/operations",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(parameters('api_service_name'), '/biib-ingest/',variables('LogicResources')[copyindex()]['name'])]",
+            "dependsOn": [
+                "[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/apis', parameters('api_service_name'), 'biib-ingest')]"
+            ],
+            "properties": {
+                "displayName": "[concat(variables('LogicResources')[copyindex()]['name'],'_invoke')]",
+                "method": "POST",
+                "urlTemplate": "[concat(variables('LogicResources')[copyindex()]['path'],'/invoke')]",
+                "templateParameters": [],
+                "responses": []
+            },
+			"copy": {
+				"name": "copy",
+				"count": "[length(variables('LogicResources'))]"
+			}
+        },
+		{
+            "type": "Microsoft.ApiManagement/service/properties",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(parameters('api_service_name'), '/',variables('LogicResources')[copyindex()]['name'],'-sig')]",
+            "properties": {
+                "displayName": "[concat(variables('LogicResources')[copyindex()]['name'], '_manual-invoke')]",
+                "value": "[listCallbackUrl(variables('LogicResources')[copyindex()]['id'], variables('apiVersion')).queries.sig]",
+                "tags": [
+                    "key",
+                    "logic",
+                    "auto",
+					"biib"
+                ],
+                "secret": true
+            },
+			"copy": {
+				"name": "copy",
+				"count": "[length(variables('LogicResources'))]"
+			}
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/backends",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(parameters('api_service_name'), '/' ,variables('LogicResources')[copyindex()]['name'],'-backend')]",
+            "properties": {
+                "description": "[variables('LogicResources')[copyindex()]['name']]",
+				"url": "[replace(listCallbackUrl(variables('LogicResources')[copyindex()]['id'], '2019-05-01').basePath,'/manual/paths/invoke','')]",
+                "protocol": "http",
+                "resourceId": "[concat('https://management.azure.com/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('biib_rg'), '/providers/Microsoft.Logic/workflows/', variables('LogicResources')[copyindex()]['name'])]"
+            },
+			"copy": {
+				"name": "copy",
+				"count": "[length(variables('LogicResources'))]"
+			}
+        },
+		{
+            "type": "Microsoft.ApiManagement/service/apis/operations/policies",
+            "apiVersion": "2019-01-01",
+            "name": "[concat(parameters('api_service_name'), '/biib-ingest/' ,variables('LogicResources')[copyindex()]['name'], '/policy')]",
+            "dependsOn": [
+                "[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/apis/operations', parameters('api_service_name'),'biib-ingest', concat(variables('LogicResources')[copyindex()]['name']))]",
+                "[resourceId(parameters('api_service_rg'), 'Microsoft.ApiManagement/service/apis', parameters('api_service_name'),'biib-ingest')]"
+            ],
+            "properties": {
+                "value": "[concat('<policies>\r\n  <inbound>\r\n    <base />\r\n    <set-backend-service id=\"apim-generated-policy\" backend-id=\"',variables('LogicResources')[copyindex()]['name'],'-backend','\" />\r\n    <set-method id=\"apim-generated-policy\">POST</set-method>\r\n    <rewrite-uri id=\"apim-generated-policy\" template=\"/manual/paths/invoke/?api-version=2016-06-01&amp;sp=/triggers/manual/run&amp;sv=1.0&amp;sig={{', variables('LogicResources')[copyindex()]['name'], '_manual-invoke','}}\" />\r\n    <set-header id=\"apim-generated-policy\" name=\"Ocp-Apim-Subscription-Key\" exists-action=\"delete\" />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>')]",
+                "format": "xml"
+            },
+			"copy": {
+				"name": "copy",
+				"count": "[length(variables('LogicResources'))]"
+			}
+        }
+	]
+}

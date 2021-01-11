@@ -1,0 +1,530 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "spnTenantId":{
+            "type":"string"
+        },
+        "spnObjectId":{
+            "type":"string"
+        },
+		"org": {
+			"type": "string"
+		},
+		"env": {
+			"type": "string"
+		},
+		"rgLocation": {
+			"type": "string"
+		},
+        "storageLocation": {
+            "type": "string",
+            "defaultValue":"use2"
+            
+        },
+		"functionNamePostfix": {
+			"type": "array",
+			"defaultValue": [
+				"receive",
+				"logging",
+				"mapping",
+				"routinghttp",
+				"routingsq",
+				"biibui",
+				"amq"
+			]
+		},
+		"funcStorageName":{
+			"type": "array",
+			"defaultValue": [
+				"0002",
+				"0003",
+				"0004",
+				"0005",
+				"0006",
+				"0007",
+				"0008"
+			]
+		},
+		"blobContainerName": {
+			"type": "array",
+			"defaultValue": [
+				"/default/$web",
+				"/default/configuration",
+				"/default/transactions",
+				"/default/failures",
+				"/default/deadletters"
+			]
+		},
+		"gridTopicNamePostfix": {
+			"type": "array",
+			"defaultValue": [
+				"-receivequeue",
+				"-receivestream",
+				"-receivecritical",
+				"-receivereprocess"
+			]
+		},
+		"sqlPass": {
+            "type": "string"
+        },
+		"vnet_name": {
+            "defaultValue": "vnet-icoe-bib-poc",
+            "type": "String"
+        },
+		"vnet_prefix": {
+		   "defaultValue": "172.117.0.0/16",
+            "type": "String"
+        },
+		"subnet_prefix": {
+		   "defaultValue": "172.117.0.0/24",
+            "type": "String"
+        },
+		"ai_name": {
+            "defaultValue": "ai-icoe-bib-poc-01",
+            "type": "String"
+        }
+	},
+    "variables": {
+		"storageAccountName": "[concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),'0001')]",
+		"storageType": "Standard_LRS",
+        "storageAccountID": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+		"hostingPlanName": "[concat('asp-',parameters('org'),'-bib-',parameters('env'))]",
+		"functionNamePrefix": "[concat('asfa-',parameters('org'),'-bib-',parameters('env'),'-')]",
+        "functionWorkerRuntime": "java"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('hostingPlanName')]",
+            "location": "[parameters('rgLocation')]",
+            "sku": {
+                "name": "EP1",
+                "tier": "ElasticPremium",
+                "size": "EP1",
+                "family": "EP",
+                "capacity": 1
+            },
+            "kind": "elastic",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 50,
+                "isSpot": false,
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "condition": true,
+			"type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2019-04-01",
+            "location": "[parameters('rgLocation')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "[variables('storageType')]",
+                "tier": "Standard"
+            },
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "enabled": true
+                        },
+                        "blob": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+		{
+            "condition": true,
+			"type": "Microsoft.Storage/storageAccounts",
+            "name": "[concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),parameters('funcStorageName')[copyIndex()])]",
+            "apiVersion": "2019-04-01",
+            "location": "[parameters('rgLocation')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "[variables('storageType')]",
+                "tier": "Standard"
+            },
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "enabled": true
+                        },
+                        "blob": {
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            },
+			"copy": {
+				"name": "storage-function-copy",
+				"count": "[length(parameters('funcStorageName'))]"
+			}
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2019-04-01",
+            "name": "[concat(variables('storageAccountName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-04-01",
+            "name": "[concat(variables('storageAccountName'), parameters('blobContainerName')[copyIndex()])]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            },
+			"copy": {
+				"name": "blob-container-copy",
+				"count": "[length(parameters('blobContainerName'))]"
+			}
+        },
+        {
+            "condition": true,
+			"apiVersion": "2015-08-01",
+            "type": "Microsoft.Web/sites",
+            "name": "[concat(variables('functionNamePrefix'),parameters('functionNamePostfix')[copyIndex()])]",
+            "location": "[parameters('rgLocation')]",
+            "kind": "functionapp",
+            "identity": {"type": "SystemAssigned"},
+			"copy": {
+				"name": "fa-copy",
+				"count": "[length(parameters('functionNamePostfix'))]"
+			},
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),parameters('funcStorageName')[copyIndex()]))]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),parameters('funcStorageName')[copyIndex()]), ';AccountKey=', listKeys(concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),parameters('funcStorageName')[copyIndex()]),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),parameters('funcStorageName')[copyIndex()]), ';AccountKey=', listKeys(concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),parameters('funcStorageName')[copyIndex()]),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),parameters('funcStorageName')[copyIndex()]), ';AccountKey=', listKeys(concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),parameters('funcStorageName')[copyIndex()]),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(concat(variables('functionNamePrefix'),parameters('functionNamePostfix')[copyIndex()]))]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                            "value": "~8"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "[variables('functionWorkerRuntime')]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.EventGrid/topics",
+            "apiVersion": "2019-06-01",
+            "name": "[concat('egs-',parameters('org'),'-bib-',parameters('env'),parameters('gridTopicNamePostfix')[copyIndex()])]",
+            "location": "[parameters('rgLocation')]",
+            "tags": {
+                "business_unit": "Enterprise-Global"
+            },
+            "properties": {},
+			"copy": {
+				"name": "grid-topic-copy",
+				"count": "[length(parameters('gridTopicNamePostfix'))]"
+			}
+        },
+		{
+            "type": "Microsoft.EventHub/namespaces",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs')]",
+            "location": "[parameters('rgLocation')]",
+            "tags": {
+                "business_unit": "Enterprise-Global"
+            },
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard",
+                "capacity": 1
+            },
+            "properties": {
+                "zoneRedundant": false,
+                "isAutoInflateEnabled": false,
+                "maximumThroughputUnits": 0,
+                "kafkaEnabled": true
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs', '/RootManageSharedAccessKey')]",
+            "location": "[parameters('rgLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs",
+            "apiVersion": "2017-04-01",
+            "name": "[concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs', '/evh-logs')]",
+            "location": "[parameters('rgLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs'))]"
+            ],
+            "properties": {
+                "messageRetentionInDays": 1,
+                "partitionCount": 5,
+                "status": "Active"
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/networkRuleSets",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs', '/default')]",
+            "location": "[parameters('rgLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs'))]"
+            ],
+            "properties": {
+                "defaultAction": "Deny",
+                "virtualNetworkRules": [],
+                "ipRules": []
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs', '/evh-logs/ReadMessages')]",
+            "location": "[parameters('rgLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs'), 'evh-logs')]",
+                "[resourceId('Microsoft.EventHub/namespaces', concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs', '/evh-logs/$Default')]",
+            "location": "[parameters('rgLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs'), 'evh-logs')]",
+                "[resourceId('Microsoft.EventHub/namespaces', concat('eh-',parameters('org'),'-bib-',parameters('env'),'-logs'))]"
+            ],
+            "properties": {}
+        },
+		{
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat('dbs-',parameters('org'),'-bib-',parameters('env'),'-logs')]",
+            "location": "[parameters('rgLocation')]",
+            "tags": {
+                "business_unit": "Enterprise-Global"
+            },
+            "kind": "v12.0",
+            "properties": {
+                "administratorLogin": "biib-admin",
+				"administratorLoginPassword": "[parameters('sqlPass')]",
+                "version": "12.0"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2017-10-01-preview",
+            "name": "[concat('dbs-',parameters('org'),'-bib-',parameters('env'),'-logs', '/db-',parameters('org'),'-bib-logs')]",
+            "location": "[parameters('rgLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', concat('dbs-',parameters('org'),'-bib-',parameters('env'),'-logs'))]"
+            ],
+            "tags": {
+                "business_unit": "Enterprise-Global"
+            },
+            "sku": {
+                "name": "GP_S_Gen5",
+                "tier": "GeneralPurpose",
+                "family": "Gen5",
+                "capacity": 6
+            },
+            "kind": "v12.0,user,vcore,serverless",
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 34359738368,
+                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                "zoneRedundant": false,
+                "licenseType": "LicenseIncluded",
+                "readScale": "Disabled",
+                "readReplicaCount": 0,
+                "autoPauseDelay": 60,
+                "minCapacity": 1
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat('dbs-',parameters('org'),'-bib-',parameters('env'),'-logs', '/AllowAllWindowsAzureIps')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', concat('dbs-',parameters('org'),'-bib-',parameters('env'),'-logs'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+            }
+        },
+		{
+            "type": "microsoft.insights/components",
+            "apiVersion": "2015-05-01",
+            "name": "[concat('ai-',parameters('org'),'-bib-',parameters('env'),'-01')]",
+            "location": "[parameters('rgLocation')]",
+            "tags": {
+                "business_unit": "Enterprise-Global"
+            },
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web",
+                "Flow_Type": "Redfield",
+                "Request_Source": "IbizaAIExtension"
+            }
+        },
+		{
+            "type": "microsoft.operationalinsights/workspaces",
+            "apiVersion": "2015-11-01-preview",
+            "name": "[concat('law-',parameters('org'),'-bib-',parameters('env'),'-lamonitor')]",
+            "location": "[parameters('rgLocation')]",
+            "properties": {
+                "sku": {
+                    "name": "free"
+                },
+                "retentionInDays": 7
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2018-02-14",
+            "name": "[concat('kv-',parameters('org'),'-bib-',parameters('env'),'-01') ]",
+            "location": "[parameters('rgLocation')]",
+            "tags": {
+                "business_unit": "Enterprise-Global"
+            },
+            "properties": {
+                "sku": {
+                    "family": "A",
+                    "name": "Standard"
+                },
+                "tenantId": "[parameters('spnTenantId')]",
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": false,
+                "enableSoftDelete": true,
+                "accessPolicies": [
+                    {
+                        "tenantId": "[parameters('spnTenantId')]",
+                        "objectId": "[parameters('spnObjectId')]",
+                        "permissions": {
+                            "keys": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "secrets": [
+                                "Get",
+                                "List",
+                                "Set",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore"
+                            ],
+                            "certificates": [
+                                "Get",
+                                "List",
+                                "Update",
+                                "Create",
+                                "Import",
+                                "Delete",
+                                "Recover",
+                                "Backup",
+                                "Restore",
+                                "ManageContacts",
+                                "ManageIssuers",
+                                "GetIssuers",
+                                "ListIssuers",
+                                "SetIssuers",
+                                "DeleteIssuers"
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+	]
+}

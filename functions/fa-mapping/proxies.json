@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json.schemastore.org/proxies",
+  "proxies": {
+    "run-mapping": {
+      "matchCondition": {
+          "methods": [ "POST" ],
+          "route": "/api/process/mappings"
+      },
+      "backendUri": "http://localhost/api/RunMappingTest"
+  },
+  "run-mapping-short": {
+    "matchCondition": {
+        "methods": [ "POST" ],
+        "route": "/api/mappings"
+    },
+    "backendUri": "http://localhost/api/RunMappingTest"
+}
+  }
+}
+

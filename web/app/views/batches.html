@@ -1,0 +1,33 @@
+<div class="row">
+ <h1>Batches</h1>
+</div>
+<div class="row top10">
+			<button class="btn" ng-click="loadBatches()" >LOAD</button>
+			<button class="btn btn-danger" ng-click="deleteBatches()" >DELETE</button>
+	
+	</div>
+</div>	
+<div class="row top10">
+<table class="table table-bordered">
+		<tr>
+			<th>Modified</th>
+			<th>Event</th>
+			<th>Started</th>
+			<th>Final</th>
+			<th>Failures</th>
+			<th>Index</th>
+			<th>Count</th>
+		</tr>
+		<tr ng-repeat="batch in batches">
+			<td>{{batch.modified}}</td>
+			<td>{{batch.event}}</td>
+			<td>{{batch.started}}</td>
+			<td>{{batch.final}}</td>
+			<td>{{batch.failures}}</td>
+			<td>{{batch.index}}</td>
+			<td>{{batch.count}}</td>
+		</tr>
+	</table>
+	
+</div>
+

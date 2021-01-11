@@ -1,0 +1,21 @@
+<div class="row">
+ <h1>File Key Name to Event</h1>
+</div>
+<div class="row top10">
+	<div >
+		<button class="btn" ng-click="saveFilenameXREF()" >SAVE</button></li>
+	</div>
+</div>	
+<div class="row">
+	<p>Please note these keys will not be case sensitive.</p>
+	<div class="row top3" ng-repeat="item in events">
+				<button  class="btn btn-danger btn-xs" ng-click="removeItem($index)">X</button>
+				<input type="text" ng-model="item.key"/>=
+				<input type="text" ng-model="item.event"/>
+			</div>
+			<div class="row top5">
+				<button class="btn btn-success btn-xs" ng-click="addItem()">+</button>
+			</div>
+</div>	
+
+

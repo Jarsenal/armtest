@@ -1,0 +1,13 @@
+{
+  "type": "eventHubTrigger",
+  "functionTimeout":"00:05:00",
+  "name": "msg",
+  "direction": "in",
+  "eventHubName": "evh-logs",
+  "connection": "EventHub",
+  "eventHub": {
+    "maxBatchSize": 128,
+    "prefetchCount": 128,
+    "batchCheckpointFrequency": 1
+  }
+}

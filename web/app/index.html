@@ -1,0 +1,95 @@
+<!doctype html>
+<html ng-app="app">
+<head>
+<title>BiiB</title>
+<link rel="stylesheet"	href="css/bootstrap3-3-7.min.css" />
+<link rel="stylesheet" href="css/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="css/common.css" />
+<script	src="js/angular.min.js"></script>
+ <script src="js/angular-route.js"></script>
+ <script src="js/angular-animate.js"></script>
+ <script src="js/jquery3-3-1.min.js"></script>
+ <script src="js/bootstrap.min.js"></script>
+ <script src="js/app.js"></script>
+<script src="js/controllers/mainCtrl.js"></script>
+<script src="js/controllers/modalsCtrl.js"></script>
+<script src="js/controllers/mappingCtrl.js"></script>
+<script src="js/controllers/mqtoeventCtrl.js"></script>
+<script src="js/controllers/routingCtrl.js"></script>
+<script src="js/controllers/eventCtrl.js"></script>
+<script src="js/controllers/transactionsCtrl.js"></script>
+<script src="js/controllers/transactionAttributesCtrl.js"></script>
+</head>
+
+<body role="document" ng-app="homeApp" style="background-color:#f9f9f9;" ng-controller="mainCtrl">
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle"	data-toggle="collapse" data-target="#myNavbar">
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#/Home">BiiB - {{title}}</a>
+			</div>
+			<div class="collapse navbar-collapse" id="myNavbar">
+				<ul class="nav navbar-nav">
+					<li class="dropdown">
+				      <a class="dropdown-toggle" data-toggle="dropdown" >Configurations
+				      <span class="caret"></span></a>
+				      <ul class="dropdown-menu">
+						<li ng-class="{ active: isActive('#/event') }"><a href="#/event">Events</a></li>
+						<li ng-class="{ active: isActive('#/mapping') }"><a href="#/mapping">Mapping</a></li>
+						<li ng-class="{ active: isActive('#/routing') }"><a href="#/routing">Routing</a></li>
+						<li ng-class="{ active: isActive('#/mqtoevent') }"><a href="#/mqtoevent">MQ to Event</a></li>
+					  </ul>
+				    </li>
+				    <li class="dropdown">
+				      <a class="dropdown-toggle" data-toggle="dropdown" >Tools
+				      <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li ng-class="{ active: isActive('#/transactions') }"><a href="#/transactions">Transactions</a></li>
+							<li ng-class="{ active: isActive('#/attributesearch') }"><a href="#/attributesearch">Attribute Search</a></li>
+						</ul>
+				    </li>
+					<li ng-class="{ active: isActive('#/help') }"><a href="#/help">Help</a></li>
+					<li ng-class="{ active: isActive('#/upkey') }"><a ng-click="updatekey();">Update Key</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+ <br />
+ 	<div class="container" role="main">
+		<div class="row top17" >
+			<div class="col-xs-12 col-xs-offset-1">
+				<div ng-view class="panel-body"></div>
+			</div>
+		</div>
+		<div>
+			Version: 0.2.0
+		</div>
+	</div>
+
+	
+<!-- ng-show="subview" -->
+<div bn-modals ng-show="subview" ng-switch="subview" class="m-modals-parent" >
+        <form
+            ng-switch-when="updatemykey"
+            ng-controller="updatekey"
+            ng-submit="submit()"
+            class="modals-parent">
+            <div class="row"><h2>Insert Key</h2></div>
+            <div class="row" ng-if="errorMessage"><strong>Sorry:</strong> {{ errorMessage }}</div>
+			<div class="row top5">
+						<span><input type="password" ng-model="key"/></span>
+			</div>
+			<div class="row top5">
+                <a ng-click="submit()">Save</a>
+                &mdash;
+                <a ng-click="cancel()">Cancel</a>
+            </div>
+        </form>
+    </div>
+	
+</body>
+</html>

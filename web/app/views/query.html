@@ -1,0 +1,109 @@
+<div class="row">
+ <h1>Query</h1>
+</div>
+<div class="row">
+	<h2>{{ query.name }}</h2>
+</div>		
+<div class="row top10">
+	<div>
+			<button class="btn" ng-click="loadQuery()" >LOAD</button>
+			<button class="btn" ng-click="saveQuery()" >SAVE</button>
+			<button class="btn" ng-click="saveasQuery()" >SAVE AS</button>
+			<button class="btn btn-success" ng-click="sendQuery()" >TEST</button>
+	</div>
+</div>
+<div class="row top10" >
+	<div class="panel panel-default">
+		<div class="panel-heading" ><b>Configuration</b></div>
+		<div class="panel-body">
+			<div class="row top5" ng-repeat="item in sql.config">
+				<button class="btn btn-danger btn-xs" ng-click="removeItem($index)">X</button>
+				<input type="text" ng-model="item.key"/>=
+				<input type="text" ng-model="item.value"/>
+			</div>
+			<div class="row top5">
+				<button class="btn btn-success btn-xs" ng-click="addItem()">+</button>
+			</div>
+			<div class="row top5">
+				Date Format: <input type="text" ng-model="sql.date"/>
+			</div>
+		</div>
+	</div>	
+</div>	
+<div class="row top10" >
+	<div class="panel panel-default col-sm-6">
+		<div class="panel-heading" >
+			<p><b>Query</b></p>
+			<p>Paste query below</p>
+		</div>
+		<div class="panel-body">
+		<textarea 	id="TextArea" 
+		wrap="off" 
+		ng-class="textarea"
+		ng-model="sql.request" 
+		ng-blur="checkVars()"
+		placeholder="Paste sql here, use '<<'VARIABLE'>>' to indicate variable.  Provide value below."
+		style="width: 100%;  min-width:250px; min-height: 200px; font-size: 17px;">
+        </textarea>
+       </div>
+       <div class="row" ng-repeat="vari in sql.variables"  >
+       		<b>{{ vari.name }}</b> &mdash;
+       		<input type="text" ng-model="vari.value" />
+ 		</div>
+   </div>
+   <div class="panel panel-default col-sm-6">
+		<div class="panel-heading" >
+			<p><b>Result</b></p>
+			<p>Will limit the pull to no more than 10 records</p>
+		</div>
+		<div class="panel-body">
+		
+       	<textarea readonly
+						id="TextArea" 
+						wrap="off" 
+						ng-class="textarea"
+						ng-model="result" 
+						style="width: 100%; min-width: 150px; min-height: 200px; font-size: 17px;">
+			</textarea>
+		</div>
+   
+   </div>
+</div>
+
+<!-- ng-show="subview" -->
+<div bn-modals ng-show="subview" ng-switch="subview" class="m-modals" >
+        <form ng-switch-when="load" 
+        	ng-controller="loadQueryController" 
+        	ng-submit="submit()" 
+        	class="modals">
+            <div class="row"><h2>Select query to load</h2></div>
+            <p ng-if="errorMessage"><strong>Sorry:</strong> {{ errorMessage }}</p>
+            <p>
+                <select ng-model="query.name" 
+					ng-options="x for x in queries" ></select>
+            </p>
+            <p>
+                <a ng-click="submit()">Load</a>
+                &mdash;
+                <a ng-click="cancel()">Cancel</a>
+            </p>
+        </form>
+        
+        <form
+            ng-switch-when="save"
+            ng-controller="saveQueryController"
+            ng-submit="submit()"
+            class="modals">
+            <div class="row"><h2>Select new query to save</h2></div>
+            <div class="row" ng-if="errorMessage"><strong>Sorry:</strong> {{ errorMessage }}</div>
+            <div class="row">
+                <select ng-model="query.name" 
+					ng-options="x for x in queries" ></select>
+            </div>
+            <div class="row">
+                <a ng-click="submit()">Save</a>
+                &mdash;
+                <a ng-click="cancel()">Cancel</a>
+            </div>
+        </form>
+    </div>

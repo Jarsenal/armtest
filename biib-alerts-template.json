@@ -1,0 +1,1998 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "metricAlerts_Main_Critical_Logic_app_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Runs Failed for Main Critical Logic App')]",
+            "type": "String"
+        },
+        "workflows_la_ph_bib_dev_main_critical_name": {
+            "defaultValue": "la-ph-bib-dev-main_critical",
+            "type": "String"
+        },
+        "workflows_la_ph_bib_dev_source_http_stream_name": {
+            "defaultValue": "la-ph-bib-dev-source_http_stream",
+            "type": "String"
+        },
+        "workflows_la_ph_bib_dev_source_http_queue_name": {
+            "defaultValue": "la-ph-bib-dev-source_http_queue",
+            "type": "String"
+        },
+        "workflows_la_ph_bib_dev_source_http_critical_name": {
+            "defaultValue": "la-ph-bib-dev-source_http_critical",
+            "type": "String"
+        },
+        "workflows_la_ph_bib_dev_order_sq_name": {
+            "defaultValue": "la-ph-bib-dev-order_sq",
+            "type": "String"
+        },
+        "workflows_la_ph_bib_dev_main_queue_name": {
+            "defaultValue": "la-ph-bib-dev-main_queue",
+            "type": "String"
+        },
+        "workflows_la_ph_bib_dev_main_reprocess_name": {
+            "defaultValue": "la-ph-bib-dev-main_reprocess",
+            "type": "String"
+        },
+        "workflows_la_ph_bib_dev_main_stream_name": {
+            "defaultValue": "la-ph-bib-dev-main_stream",
+            "type": "String"
+        },
+
+        "storageAccounts_salrsuse2phbibdev0001_name": {
+            "defaultValue": "salrsuse2phbibdev0001",
+            "type": "String"
+        },
+
+        "sites_asfa_ph_bib_dev_receive_name": {
+            "defaultValue": "asfa-ph-bib-dev-receive",
+            "type": "String"
+        },
+        "sites_asfa_ph_bib_dev_amq_name": {
+            "defaultValue": "asfa-ph-bib-dev-amq",
+            "type": "String"
+        },
+        "sites_asfa_ph_bib_dev_biibui_name": {
+            "defaultValue": "asfa-ph-bib-dev-biibui",
+            "type": "String"
+        },
+        "sites_asfa_ph_bib_dev_mapping_name": {
+            "defaultValue": "asfa-ph-bib-dev-mapping",
+            "type": "String"
+        },
+        "sites_asfa_ph_bib_dev_logging_name": {
+            "defaultValue": "asfa-ph-bib-dev-logging",
+            "type": "String"
+        },
+        "sites_asfa_ph_bib_dev_routingsq_name": {
+            "defaultValue": "asfa-ph-bib-dev-routingsq",
+            "type": "String"
+        },
+        "sites_asfa_ph_bib_dev_routinghttp_name": {
+            "defaultValue": "asfa-ph-bib-dev-routinghttp",
+            "type": "String"
+        },
+        "actiongroups_infosys_l2_externalid": {
+            "defaultValue": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('resourceGroup'),'/providers/microsoft.insights/actiongroups/infosys l2')]",
+            "type": "String"
+        },
+        "metricAlerts_Main_Critical_Run_Latency_exceeded_120s_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Latency exceeded 120s')]",
+            "type": "String"
+        },
+        "metricAlerts_Source_Http_Critical_Run_Latency_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Latency exceeding 3 seconds')]",
+            "type": "String"
+        },
+        "metricAlerts_Source_Http_Queue_Runs_Failed_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Runs Failed for Source Http logic app is greater than 5')]",
+            "type": "String"
+        },
+        "metricAlerts_Source_queue_Max_run_latency_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Max run latency exceeded 2 seconds')]",
+            "type": "String"
+        },
+        "metricAlerts_Source_Htts_Stream_Runs_Failed_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Runs Failed  logic app run failed greater than1')]",
+            "type": "String"
+        },
+        "metricAlerts_Source_Http_Critical_Runs_Failed_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-1 Run Failed in logic app')]",
+            "type": "String"
+        },
+        "metricAlerts_Order_SQ_Run_Latency_greater_than_3_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Latency greater than 3')]",
+            "type": "String"
+        },
+        "metricAlerts_Runs_have_Failed_in_Order_SQ_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run greater than or equals1 have failed in order-sq logic app')]",
+            "type": "String"
+        },
+        "metricAlerts_Main_Queue_Runs_Failed_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Failed greater than 15 in main_queue logic app')]",
+            "type": "String"
+        },
+		"metricAlerts_Main_Sequenced_Runs_Failed_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Failed greater than 15 in main_sequenced logic app')]",
+            "type": "String"
+        },
+        "metricAlerts_Main_Queue_Run_Latency_exceeded_120s_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Latency exceeded 120s')]",
+            "type": "String"
+        },
+        "metricAlerts_Main_Reprocess_Runs_Failed_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Runs Failedgreater than 15 in main_reprocess logic app')]",
+            "type": "String"
+        },
+        "metricAlerts_Main_Reprocess_Run_Latency_exceeded_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Runs Latency for reprocess logic app rungreater than60s')]",
+            "type": "String"
+        },
+        "metricAlerts_Main_Stream_Runs_Failed_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Runs failed for main stream greater than 15')]",
+            "type": "String"
+        },
+        "metricAlerts_Http_Stream_Run_latency_more_than_3_secs_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run latency more than 3 secs')]",
+            "type": "String"
+        },
+
+        "activityLogAlerts_Updates_made_for_salrsuse2phbibdev0001_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Updates have been made to the storage account')]",
+            "type": "String"
+        },
+        "metricAlerts_Transactions_error_for_salrsuse2phbibdev0001_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Transactions error for salrsuse2phbibdev0001')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Storage_Account_Failover_for_salrsuse2phbibdev0001_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Storage Account Failover for salrsuse2phbibdev0001')]",
+            "type": "String"
+        },
+
+        "metricAlerts_4xx_error_count_is_more_than_5_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run 4xx error count is more than 5')]",
+            "type": "String"
+        },
+        "metricAlerts_amq_http_4xx_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run amq http 4xx')]",
+            "type": "String"
+        },
+        "metricAlerts_AMQ_function_App_4xx_count_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run AMQ function App 4xx count')]",
+            "type": "String"
+        },
+        "metricAlerts_AMQ__connections_are_0_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run AMQ- connections are 0')]",
+            "type": "String"
+        },
+        "metricAlerts_The_connections_for_receive_function_app_is_0_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run The connections for receive function app is 0')]",
+            "type": "String"
+        },
+        "activityLogAlerts_AMQ_Function_App_has_been_started_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run AMQ Function App has been started')]",
+            "type": "String"
+        },
+        "activityLogAlerts_AMQ__app_has_been_stopped_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run AMQ- app has been stopped')]",
+            "type": "String"
+        },
+        "activityLogAlerts_BiiB_UI_Function_App_has_been_stopped_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run BiiB UI Function App has been stopped')]",
+            "type": "String"
+        },
+        "activityLogAlerts_BiiBUI_FA_has_been_deleted_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run BiiBUI FA has been deleted')]",
+            "type": "String"
+        },
+        "activityLogAlerts_BiiBUI_Function_App_has_been_started_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run BiiBUI Function App has been started')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Function_app_has_been_deleted_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Function app has been deleted')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Function_app_has_been_stopped_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Function app has been stopped')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Logging_FA_has_been_deleted_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Logging FA has been deleted')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Logging_FA_has_been_started_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Logging FA has been started')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Logging_FA_has_been_stopped_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Logging FA has been stopped')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Mapping_Function_App_has_been_started_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Mapping Function App has been started')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Receive_FA_has_been_started_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Receive FA has been started')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Receive_Function_App_has_been_stopped_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Receive Function App has been stopped')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Routing_FA_has_been_stopped_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Routing FA has been stopped')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Routing_Http_FA_has_been_started_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Routing Http FA has been started')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Routing_Http_function_app_has_been_deleted_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Routing Http function app has been deleted')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Routing_Http_has_been_stopped_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Routing Http has been stopped')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Routing_SQ_FA_has_been_deleted_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Routing SQ FA has been deleted')]",
+            "type": "String"
+        },
+        "activityLogAlerts_Routing_SQ_FA_has_been_started_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-Run Routing SQ FA has been started')]",
+            "type": "String"
+        },
+        "metricAlerts_Avaliability_of_Storage_Account_is_low_name": {
+            "defaultValue": "Avaliability of Storage Account is low",
+            "type": "String"
+        },
+        "metricAlerts_sima_dev_servicebus_activemessages_and_servererrors_name": {
+            "defaultValue": "[concat(parameters('org'),'-',parameters('env'),'-servicebus-activemessages-and-servererrors')]",
+            "type": "String"
+        },
+        "org": {
+            "type": "string"
+        },
+        "env": {
+            "type": "string"
+        },
+        "storageLocation": {
+            "type": "string"
+        },
+        "resourceGroup": {
+            "type": "string"
+        },
+        "Alerts_for_SequencedFlow": {
+            "type": "bool",
+            "defaultValue": false
+        },
+		"OrderSQ_Failure_Threshold": {
+            "type": "int",
+            "defaultValue":1
+        },
+        "OrderSQ_Latency_Threshold": {
+            "type": "int",
+            "defaultValue":60
+        },
+        "SourceLA_Failure_Threshold": {
+            "type": "int",
+            "defaultValue":1
+        },
+        "SourceLA_Latency_Threshold": {
+            "type": "int",
+            "defaultValue":60
+        },
+        "MainLA_Failure_Threshold": {
+            "type": "int",
+            "defaultValue":10
+        },
+        "MainLA_Latency_Threshold": {
+            "type": "int",
+            "defaultValue":60
+        },
+        "FA_Failure_Threshold": {
+            "type": "int",
+            "defaultValue":5
+        },
+        "FA_ActiveConnection_Threshold": {
+            "type": "int",
+            "defaultValue":60
+        },
+        "StorageAccount_Availability_Threshold": {
+            "type": "int",
+            "defaultValue":25
+        },
+        "ServiceBus_ActiveMsgs_Threshold": {
+            "type": "int",
+            "defaultValue": 20
+        },
+        "ServiceBus_ServerErrors_Threshold": {
+            "type": "int",
+            "defaultValue":10
+        }
+    },
+
+    "variables": {
+        "main_critical_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-main_critical')]",
+        "source_http_stream_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-source_http_stream')]",
+        "source_http_queue_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-source_http_queue')]",
+        "source_http_critical_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-source_http_critical')]",
+        "order_sq_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-order_sq')]",
+        "main_queue_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-main_queue')]",
+		"main_sequenced_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-main_sequenced')]",
+        "main_reprocess_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-main_reprocess')]",
+        "main_stream_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-main_stream')]",
+        "http_stream_name": "[concat('la-',parameters('org'),'-bib-',parameters('env'),'-http_stream')]",
+        "salrsuse2phbibdev0001_name": "[concat('salrs',parameters('storageLocation'),parameters('org'),'bib',parameters('env'),'0001')]",
+        "receive_name": "[concat('asfa-',parameters('org'),'-bib-',parameters('env'),'-receive')]",
+        "amq_name": "[concat('asfa-',parameters('org'),'-bib-',parameters('env'),'-amq')]",
+        "biibui_name": "[concat('asfa-',parameters('org'),'-bib-',parameters('env'),'-biibui')]",
+        "mapping_name": "[concat('asfa-',parameters('org'),'-bib-',parameters('env'),'-mapping')]",
+        "logging_name": "[concat('asfa-',parameters('org'),'-bib-',parameters('env'),'-logging')]",
+        "routingsq_name": "[concat('asfa-',parameters('org'),'-bib-',parameters('env'),'-routingsq')]",
+        "routinghttp_name": "[concat('asfa-',parameters('org'),'-bib-',parameters('env'),'-routinghttp')]",
+        "sequenced_namespace_name": "[concat('sb-',parameters('org'),'-bib-',parameters('env'),'-sequenced')]"
+
+    },
+
+    "resources": [{
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Main_Critical_Logic_app_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('main_critical_name'))]"
+            ],
+            "properties": {
+                "description": "runs failed for main critical logic app greater than 15. Please check",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows', variables('main_critical_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('MainLA_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunsFailed",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Http_Stream_Run_latency_more_than_3_secs_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows', variables('source_http_stream_name'))]"
+            ],
+            "properties": {
+                "description": "Run latency for a logic app run is greater than3. Please check. ",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows', variables('source_http_stream_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('SourceLA_Latency_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunLatency",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Maximum",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Source_Htts_Stream_Runs_Failed_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows', variables('source_http_stream_name'))]"
+            ],
+            "properties": {
+                "description": "Https Stream logic app run failed greater than1. Please check",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows', variables('source_http_stream_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": 1,
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunsFailed",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Source_Http_Queue_Runs_Failed_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('source_http_queue_name'))]"
+            ],
+            "properties": {
+                "description": "Runs failed for Source Http logic app is greater than 5. Please check. ",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('source_http_queue_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('SourceLA_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunsFailed",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Source_queue_Max_run_latency_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('source_http_queue_name'))]"
+            ],
+            "properties": {
+                "description": "max run of the logic app exceeded 2 seconds",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('source_http_queue_name'))]"
+                ],
+                "evaluationFrequency": "PT1M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('SourceLA_Latency_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunLatency",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Maximum",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Source_Http_Critical_Run_Latency_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('source_http_critical_name'))]"
+            ],
+            "properties": {
+                "description": "A run of the Logic app is exceeding 3 seconds. Please check. ",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('source_http_critical_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('SourceLA_Latency_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunLatency",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Maximum",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Source_Http_Critical_Runs_Failed_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('source_http_critical_name'))]"
+            ],
+            "properties": {
+                "description": "1 Run Failed in logic app. Please check",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('source_http_critical_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('SourceLA_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunsFailed",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Order_SQ_Run_Latency_greater_than_3_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('order_sq_name'))]"
+            ],
+            "properties": {
+                "description": "storage queue logic app run latency isgreater than 3. Please check. ",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('order_sq_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('OrderSQ_Latency_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunLatency",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Maximum",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Runs_have_Failed_in_Order_SQ_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('order_sq_name'))]"
+            ],
+            "properties": {
+                "description": "runs greater than or equals1 have failed in order-sq logic app. Please check. ",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('order_sq_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('OrderSQ_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunsFailed",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": []
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Main_Queue_Runs_Failed_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('main_queue_name'))]"
+            ],
+            "properties": {
+                "description": "Runs Failedgreater than 15",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('main_queue_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('MainLA_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunsFailed",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, 
+		{
+            "condition": "[parameters('Alerts_for_SequencedFlow')]",
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Main_Sequenced_Runs_Failed_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('main_sequenced_name'))]"
+            ],
+            "properties": {
+                "description": "Runs Failedgreater than 15",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('main_sequenced_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('MainLA_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunsFailed",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        },		
+		{
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Main_Reprocess_Run_Latency_exceeded_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('main_reprocess_name'))]"
+            ],
+            "properties": {
+                "description": "Runs Latency for reprocess logic app rungreater than60s. Please check",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('main_reprocess_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('MainLA_Latency_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunLatency",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Maximum",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Main_Reprocess_Runs_Failed_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('main_reprocess_name'))]"
+            ],
+            "properties": {
+                "description": "Runs Failedgreater than 15",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('main_reprocess_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('MainLA_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunsFailed",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Main_Stream_Runs_Failed_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',variables('main_stream_name'))]"
+            ],
+            "properties": {
+                "description": "Runs failed for main stream greater than 15. Please check. ",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Logic/workflows',variables('main_stream_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('MainLA_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Logic/workflows",
+                            "metricName": "RunsFailed",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Logic/workflows",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Storage_Account_Failover_for_salrsuse2phbibdev0001_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts',variables('salrsuse2phbibdev0001_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Storage/storageAccounts',variables('salrsuse2phbibdev0001_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Storage/storageAccounts/failover/action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Updates_made_for_salrsuse2phbibdev0001_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts',variables('salrsuse2phbibdev0001_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Storage/storageAccounts',variables('salrsuse2phbibdev0001_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Storage/storageAccounts/write"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "Updates have been made to the storage account. "
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_Avaliability_of_Storage_Account_is_low_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts',variables('salrsuse2phbibdev0001_name'))]"
+            ],
+            "properties": {
+                "description": "<25%. please check",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Storage/storageAccounts',variables('salrsuse2phbibdev0001_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('StorageAccount_Availability_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Storage/storageAccounts",
+                            "metricName": "Availability",
+                            "dimensions": [{
+                                    "name": "GeoType",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }, {
+                                    "name": "ApiName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }, {
+                                    "name": "Authentication",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "LessThanOrEqual",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Storage/storageAccounts",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_4xx_error_count_is_more_than_5_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('receive_name'))]"
+            ],
+            "properties": {
+                "description": "Please check in receive function app. ",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Web/sites',variables('receive_name'))]"
+                ],
+                "evaluationFrequency": "PT1M",
+                "windowSize": "PT5M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('FA_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Web/sites",
+                            "metricName": "Http4xx",
+                            "dimensions": [{
+                                    "name": "Instance",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThanOrEqual",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Web/sites",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_AMQ_function_App_4xx_count_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('amq_name'))]"
+            ],
+            "properties": {
+                "description": "4xx error count greater than 10",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Web/sites',variables('amq_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('FA_Failure_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Web/sites",
+                            "metricName": "Http4xx",
+                            "dimensions": [{
+                                    "name": "Instance",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Web/sites",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_AMQ__connections_are_0_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('amq_name'))]"
+            ],
+            "properties": {
+                "description": "Connections to/from the fucntion app is 0. Please check",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Web/sites',variables('amq_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT30M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('FA_ActiveConnection_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Web/sites",
+                            "metricName": "AppConnections",
+                            "dimensions": [],
+                            "operator": "LessThanOrEqual",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Web/sites",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_The_connections_for_receive_function_app_is_0_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('receive_name'))]"
+            ],
+            "properties": {
+                "description": "Connectivity issues for the function app. Please check",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Web/sites',variables('receive_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT15M",
+                "criteria": {
+                    "allOf": [{
+                            "threshold": "[parameters('FA_ActiveConnection_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.Web/sites",
+                            "metricName": "AppConnections",
+                            "dimensions": [{
+                                    "name": "Instance",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "LessThanOrEqual",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Web/sites",
+                "actions": [{
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_AMQ_Function_App_has_been_started_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('amq_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('amq_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/start/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "AMQ function app has been started"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_AMQ__app_has_been_stopped_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('amq_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('amq_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/stop/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "the function has been stopped. "
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_BiiB_UI_Function_App_has_been_stopped_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('biibui_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('biibui_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/stop/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": []
+                },
+                "enabled": true,
+                "description": "The function app has been stopped. Please check."
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_BiiBUI_FA_has_been_deleted_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('biibui_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('biibui_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/Delete"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": []
+                },
+                "enabled": true,
+                "description": "The function app has been deleted, please check"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_BiiBUI_Function_App_has_been_started_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('biibui_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('biibui_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/start/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[parameters('activityLogAlerts_BiiBUI_Function_App_has_been_started_name')]"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Function_app_has_been_deleted_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('mapping_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('mapping_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/Delete"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "Function Apps:\nAsyncQueuedJobBatch\nAsyncQueuedJobCritical\nAsyncQueuedJobReprocess\nRunMappingAsynchJob\nRunMappingJob\nRunMappingTest\nRunReceiveJob"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Function_app_has_been_stopped_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('mapping_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('mapping_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/stop/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": []
+                },
+                "enabled": true,
+                "description": "Function Apps:\nAsyncQueuedJobBatch\nAsyncQueuedJobCritical\nAsyncQueuedJobReprocess\nRunMappingAsynchJob\nRunMappingJob\nRunMappingTest\nRunReceiveJob"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Logging_FA_has_been_deleted_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('logging_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('logging_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/Delete"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "Logging function app has been deleted. Please check."
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Logging_FA_has_been_started_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('logging_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('logging_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/start/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[parameters('activityLogAlerts_Logging_FA_has_been_started_name')]"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Logging_FA_has_been_stopped_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('logging_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('logging_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/stop/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "The function app has been stopped. Please check. "
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Mapping_Function_App_has_been_started_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('mapping_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('mapping_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/start/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[parameters('activityLogAlerts_Mapping_Function_App_has_been_started_name')]"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Receive_FA_has_been_started_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('receive_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('receive_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/start/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[parameters('activityLogAlerts_Receive_FA_has_been_started_name')]"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Receive_Function_App_has_been_stopped_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('receive_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('receive_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/stop/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[concat(parameters('activityLogAlerts_Receive_Function_App_has_been_stopped_name'), '. Please check.')]"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Routing_FA_has_been_stopped_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('routingsq_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('routingsq_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/stop/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[parameters('activityLogAlerts_Routing_FA_has_been_stopped_name')]"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Routing_Http_FA_has_been_started_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('routinghttp_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('routinghttp_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/start/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[parameters('activityLogAlerts_Routing_Http_FA_has_been_started_name')]"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Routing_Http_function_app_has_been_deleted_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('routinghttp_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('routinghttp_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/Delete"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[concat(parameters('activityLogAlerts_Routing_Http_function_app_has_been_deleted_name'), '. Please check')]"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Routing_Http_has_been_stopped_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('routinghttp_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('routinghttp_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/stop/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "The FA has been stopped. Please check"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Routing_SQ_FA_has_been_deleted_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('routingsq_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('routingsq_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/Delete"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[parameters('activityLogAlerts_Routing_SQ_FA_has_been_deleted_name')]"
+            }
+        }, {
+            "type": "microsoft.insights/activityLogAlerts",
+            "apiVersion": "2017-04-01",
+            "name": "[parameters('activityLogAlerts_Routing_SQ_FA_has_been_started_name')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites',variables('routingsq_name'))]"
+            ],
+            "properties": {
+                "scopes": [
+                    "[concat('/subscriptions/',subscription().subscriptionId)]"
+                ],
+                "condition": {
+                    "allOf": [{
+                            "field": "category",
+                            "equals": "Administrative"
+                        }, {
+                            "field": "resourceId",
+                            "equals": "[resourceId('Microsoft.Web/sites',variables('routingsq_name'))]"
+                        }, {
+                            "field": "operationName",
+                            "equals": "Microsoft.Web/sites/start/Action"
+                        }
+                    ]
+                },
+                "actions": {
+                    "actionGroups": [{
+                            "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                            "webhookProperties": {}
+                        }
+                    ]
+                },
+                "enabled": true,
+                "description": "[parameters('activityLogAlerts_Routing_SQ_FA_has_been_started_name')]"
+            }
+        }, 
+        {
+            "condition": "[parameters('Alerts_for_SequencedFlow')]",
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('metricAlerts_sima_dev_servicebus_activemessages_and_servererrors_name')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', variables('sequenced_namespace_name'))]"
+            ],
+            "properties": {
+                "description": "checks for current queue depth and Server errors",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.ServiceBus/namespaces', variables('sequenced_namespace_name'))]"
+                ],
+                "evaluationFrequency": "PT5M",
+                "windowSize": "PT15M",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "[parameters('ServiceBus_ActiveMsgs_Threshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.ServiceBus/namespaces",
+                            "metricName": "ActiveMessages",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        },
+                        {
+                            "threshold": "[parameters('ServiceBus_ServerErrors_Threshold')]",
+                            "name": "Metric2",
+                            "metricNamespace": "Microsoft.ServiceBus/namespaces",
+                            "metricName": "ServerErrors",
+                            "dimensions": [],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.ServiceBus/namespaces",
+                "actions": [
+                    {
+                        "actionGroupId": "[parameters('actiongroups_infosys_l2_externalid')]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        },
+        {
+            "condition": false,
+            "type": "Microsoft.ServiceBus/namespaces",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[variables('sequenced_namespace_name')]"
+		},
+        {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('main_critical_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('source_http_stream_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('source_http_queue_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('source_http_critical_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('order_sq_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('main_queue_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('main_reprocess_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('main_stream_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('http_stream_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('salrsuse2phbibdev0001_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('receive_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('amq_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('biibui_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('mapping_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('logging_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('routingsq_name')]"
+        }, {
+            "condition": false,
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('routinghttp_name')]"
+        },
+        {
+            "condition": false,
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('main_sequenced_name')]"
+        }
+
+    ]
+}

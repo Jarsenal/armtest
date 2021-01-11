@@ -1,0 +1,841 @@
+<script type="text/ng-template" id="tree_item_renderer.html">
+
+<div class="row">
+	<div class="row" >
+		<div class="col-xs-1" >
+			<div ng-show="data.type=='OBJECT' || data.type=='CUSTOM'">			
+				<button class="btn btn-xs" ng-click="data.shownodes = true" ng-hide="data.shownodes" >Show</button>
+    			<button class="btn btn-xs" ng-click="data.shownodes = false" ng-show="data.shownodes" >Hide</button>
+            </div>
+	 	</div>
+		<div class="col-xs-11" ng-show="data.edit">
+			<table>
+				<tr>
+					<td>
+							<input type="text" ng-model="data.name" class="form-control input-sm"/>
+						</td>
+					<td>:</td>
+					<td>
+							<input type="text" ng-model="data.value" ng-trim="false" ng-show="!(data.type=='OBJECT' || data.type=='CUSTOM') || data.list" class="form-control input-sm"/>
+					</td>
+				</tr>
+			</table>
+		
+		</div>
+	    <div class="col-xs-11" ng-hide="data.edit" ng-click="editNode(data)">
+			<b>{{data.name}}</b>:{{data.value}}
+		</div>
+	</div>
+	<div class="row" ng-show="data.shownodes">
+    	<ul style="list-style-type: none" >
+        	<li ng-repeat="data in data.nodes" 
+				ng-include="'tree_item_renderer.html'"></li>
+			<li ng-show="data.type=='OBJECT' || data.type=='CUSTOM'">
+				<button class="btn btn-success btn-xs" ng-click="addChild(data)">+</button>
+			</li>
+    	</ul>
+	</div>
+</div>
+
+</script>
+
+<script type="text/ng-template" id="tree_schema_renderer.html">
+<div class="row" style="border-top: 2px dotted gray" ng-init="parent = node">
+<ul   ng-repeat="node in node.nodes" style="list-style-type: none">
+	<li><button class="btn btn-danger btn-xs" ng-click="removeRecord(parent.nodes, $index)">Remove Definition</button></li>
+	<li>
+		Name: <input type="text" ng-model="node.name"/>
+	</li>
+	<li>
+		Record Id: <input type="checkbox" ng-model="node.key.enable" />
+		Enable
+		<span ng-show="node.key.enable">Match: <input type="text" ng-model="node.key.value" style="width:50px"/></span>
+	</li>
+	<li>
+		<table class="table table-bordered">
+			<tr>
+				<th></th>
+				<th>Name</th>
+				<th>Length</th>
+				<th>Trim</th>
+				<th>Padding</th>
+				<th>Placement</th>
+			</tr>
+			<tr ng-repeat="field in node.fields">
+				<td><button class="btn btn-danger btn-xs" ng-click="removeChild(node.fields,$index)">X</button></td>
+				<td><input type="text" ng-model="field.name"/></td>
+				<td><input type="text" ng-model="field.length" style="width:50px"/></td>
+				<td><input type="checkbox" ng-model="field.trim"/></td>
+				<td><input type="text" ng-trim="false" ng-model="field.padding" style="width:50px"/></td>
+				<td><select ng-model="field.placement" ng-options="x for x in ['LEFT','CENTER','RIGHT']" ></select></td>
+			</tr>
+			<tr>
+				<td><button class="btn btn-success btn-xs" ng-click="addChild(node.fields)">+</button></li></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
+	</li>
+	<li ng-include="'tree_schema_renderer.html'"></li>
+</ul>
+</div>
+<button class="btn btn-success btn-xs" ng-click="addRecord(node.nodes)">Add Definition</button>
+</script>
+
+<script type="text/ng-template" id="when_renderer.html">
+<div class="row top10" style="border-left: 2px solid gray" ng-init="parent = node">
+	<ul ng-repeat="node in node.nodes" style="list-style-type: none">
+		<li><button class="btn btn-danger btn-xs" ng-click="removeRecord(parent.nodes, $index)">Remove Definition</button></li>
+		<li>Logic:
+				<select ng-model="node.action"
+				ng-options="x for x in 
+				['AND','OR','NOT AND','NOT OR','STATEMENT']" ></select></li>
+		<li ng-hide="node.action == 'STATEMENT'">Loop: <input type="text" ng-model="node.loop" /> </li>
+		<li ng-show="node.action == 'STATEMENT'">
+			<div class="row top5">
+					<select ng-model="node.type"
+					ng-options="x for x in 
+					['STRING','NUMBER','DATETIME']" />
+			</div>
+			<div class="row top5">
+				<input type="text" ng-model="node.left" placeholder="Left Operand" />
+				<input ng-show="node.type=='DATETIME'"  
+				type="text" 
+				ng-model="node.leftDateFormat" 
+				placeholder="Datetime Format yyyyMMdd'T'HHmmss.SSSZZZZ"  />
+			</div>
+			<div class="row">
+				Operation:
+				<select ng-model="node.op"
+				ng-options="x for x in 
+				['EQUALS','NOT EQUALS',
+				'LESS THAN', 'GREATER THAN',
+				'LESS THAN OR EQUAL','GREATER THAN OR EQUAL',
+				'CONTAINS','DOES NOT CONTAIN','IS NULL','IS NOT NULL']" ></select>
+			</div>
+			<div class="row" ng-hide="node.op == 'IS NULL' or node.op == 'IS NOT NULL'">
+				<input type="text" 
+				ng-model="node.right" 
+				placeholder="Right Operand"  />
+				<input ng-show="node.type=='DATETIME'"  
+				type="text" 
+				ng-model="node.rightDateFormat" 
+				placeholder="Datetime Format yyyyMMdd'T'HHmmss.SSSZZZZ"  />
+			</div>
+		</li>
+		<li ng-hide="node.action == 'STATEMENT'">
+			<div class="row" ng-include="'when_renderer.html'" ></div>
+		</li>
+	</ul>
+</div>
+<button class="btn btn-success btn-xs" ng-click="addRecord(node.nodes)">Add Condition</button>
+</script>
+
+
+<!-- This begins the list special function control list -->
+
+<!-- Zip List -->
+<script type="text/ng-template" id="ziplist_renderer.html">
+	<div class="function">
+		<button class="btn btn-danger btn-xs"
+		ng-click="removeListAdvanceFunction($index,  node.edit.listspecial)">X</button>
+		<label>ZIP LIST</label><br/>
+		<label>Name:</label> <input type="text" ng-model="item.ziplist.name" class="form-control input-sm"/>
+		<label>List:</label> <input type="text" ng-model="item.ziplist.list" class="form-control input-sm"/>
+	</div>
+</script>
+
+<!-- Concat List -->
+<script type="text/ng-template" id="concatlist_renderer.html">
+	<div class="function">
+		<button class="btn btn-danger btn-xs"
+		ng-click="removeListAdvanceFunction($index,  node.edit.listspecial)">X</button>
+		<label>CONCAT LIST</label><br/>
+		<label>List:</label> <input type="text" ng-model="item.concatlist.list" class="form-control input-sm"/>
+	</div>
+</script>
+
+<!-- Unique Filter -->
+<script type="text/ng-template" id="uniquefilter_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeListAdvanceFunction($index,  node.edit.listspecial)">X</button>
+			<label>UNIQUE FILTER</label><br/>
+
+			<table style="width:100%">
+					<tr>
+						<th></th>
+						<th><label>Field</label></th>
+					</tr>
+					<tr ng-repeat="i in item.uniquefilter">
+							<td><button ng-click="removeUniqueFilter($index,item)" class="btn btn-danger btn-xs">X</button></td>
+							<td><input type="text" ng-model="i.value" class="form-control input-sm"/></td>
+					</tr>
+					<tr>
+						<td><button class="btn btn-success btn-xs" ng-click="addUniqueFilter(item)">+</button></td>
+						<td></td>
+					</tr>
+				</table>
+
+	</div>
+</script>
+
+
+<!-- This begins the special function control list -->
+
+<!-- ABS -->
+<script type="text/ng-template" id="abs_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+<label> 
+	ABS
+</label>
+</div>
+</script>
+
+
+<!-- TRIM -->
+<script type="text/ng-template" id="trim_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+<label> 
+	TRIM
+</label>
+</div>
+</script>
+
+<!-- ADVANCE TRIM -->
+<script type="text/ng-template" id="advancetrim_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+<label> 
+	ADVANCE TRIM
+</label><br/>
+<label>Side:</label> 
+<select ng-model="item.advancetrim.direction"
+ng-options="value as key for (key, value) in 
+{'Left':'left','Right':'right','Both':'both'}" class="form-control input-sm"></select>
+<label>Character:</label>
+<input type="text" ng-trim="false"	ng-model="item.advancetrim.character" class="form-control input-sm"/>
+</div>
+</script>
+
+<!-- NUMBER -->
+<script type="text/ng-template" id="tonumber_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+<label> 
+	TO NUMBER
+</label>
+</div>
+</script>
+
+<!-- BOOLEAN -->
+<script type="text/ng-template" id="toboolean_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+<label> 
+	TO BOOLEAN
+</label>
+</div>
+</script>
+
+<!-- String -->
+<script type="text/ng-template" id="tostring_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+<label> 
+	TO STRING
+</label>
+</div>
+</script>
+
+
+<!-- QUALIFIER -->
+<script type="text/ng-template" id="qualifier_renderer.html">
+	<div class="function">
+		<button class="btn btn-danger btn-xs"
+		ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+		<label>QUALIFIER</label><br/>
+		<label>Key:</label><input type="text" ng-model="item.qualifier.key" class="form-control input-sm"/>
+		<label>Value:</label><input type="text" ng-model="item.qualifier.value" class="form-control input-sm"/>
+		<label>Return:</label><input type="text" ng-model="item.qualifier.return" class="form-control input-sm"/>
+</script>
+
+<!-- GET FIRST -->
+<script type="text/ng-template" id="getfirst_renderer.html">
+	<div class="function"  >
+		<button class="btn btn-danger btn-xs" ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+		<label>Get First</label><br/>
+		<button class="btn btn-xs btn-success" 	ng-click="editFunctionCondition(item)">Edit When</button><br/>
+		<label>Value:</label>
+		<input type="text" ng-model="item.getfirst.target" class="form-control input-sm"/>
+</script>
+
+<!-- TO NUMBER FORMATTING - Needs Work -->
+<script type="text/ng-template" id="number_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+			<label>NUMBER FORMATTING</label><br/>
+			<label>Format:</label>
+		<input type="text" ng-model="item.number.target" class="form-control input-sm"/>
+		</div>
+</script>
+
+<!-- XREF -->
+<script type="text/ng-template" id="xref_renderer.html">
+	<div class="function">
+					<button class="btn btn-danger btn-xs"
+					ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+					<label>XREF</label><br/>
+			<table style="width:100%">
+				<tr>
+					<th></th>
+					<th><label>Key</label></th>
+					<th><label>Value</label></th>
+				</tr>
+				<tr ng-repeat="i in item.xref">
+						<td><button ng-click="removeXREF($index,item)" class="btn btn-danger btn-xs">X</button></td>
+						<td><input type="text" ng-model="i.key" class="form-control input-sm"/></td>
+						<td><input type="text" ng-model="i.value" class="form-control input-sm"/></td>
+				</tr>
+				<tr>
+					<td><button class="btn btn-success btn-xs" ng-click="addXREF(item)" >+</button></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</table>
+			
+		</div>
+</script>
+
+<!-- PADDING -->
+<script type="text/ng-template" id="padding_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+			<label>PADDING</label><br/>
+			<label>Side:</label> 
+			<select ng-model="item.padding.direction"
+			ng-options="value as key for (key, value) in 
+			{'Left':'left','Right':'right'}" class="form-control input-sm"></select>
+			<label>Characters:</label>
+			<input type="text" ng-trim="false"	ng-model="item.padding.character" class="form-control input-sm"/>
+			<label>Length:</label> 
+			<input type="text"	ng-model="item.padding.length" class="form-control input-sm"/>
+			
+		</div>
+</script>
+
+<!-- JOINBY -->
+<script type="text/ng-template" id="joinby_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+			<label>Join By</label><br/>
+			<label>Characters:</label>
+			<input type="text" ng-trim="false"	ng-model="item.joinby.string" class="form-control input-sm"/>
+		</div>
+</script>
+
+<!-- SUBSTRING -->
+<script type="text/ng-template" id="substring_renderer.html">
+	<div class="function">
+					<button class="btn btn-danger btn-xs"
+					ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+					<label>SUBSTRING</label><br/>
+				<label>Start:</label><input type="text" ng-trim="false"
+					ng-model="item.substring.start" class="form-control input-sm"/>
+				<label>Length:</label><input type="text"
+					ng-model="item.substring.length" class="form-control input-sm" />
+			
+		</div>
+</script>
+
+<!-- DATETIME -->
+<script type="text/ng-template" id="datetime_renderer.html">
+	<div class="function">
+					<button class="btn btn-danger btn-xs"
+					ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+					<label>DATETIME FORMATTING</label>
+				<label>From:</label>
+				<input type="text" ng-model="item.datetime.source" class="form-control input-sm"/>
+				<label>To:</label>
+				<input type="text" ng-model="item.datetime.target" class="form-control input-sm"/>
+		</div>
+</script>
+
+<!-- CONCAT -->
+<script type="text/ng-template" id="concat_renderer.html">
+	<div class="function">
+					<button class="btn btn-danger btn-xs"
+					ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+					<label>CONCAT</label><br/>
+				<label>Side:</label> 
+				<select ng-model="item.concat.direction"
+					ng-options="value as key for (key, value) in 
+				{'Left':'left','Right':'right'}" class="form-control input-sm"></select>
+				<label>String:</label> 
+				<input type="text" ng-trim="false" ng-model="item.concat.string"
+				class="form-control input-sm" />
+			
+		</div>
+</script>
+
+<!-- SUM -->
+<script type="text/ng-template" id="sum_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+		<label> 
+			SUM LIST
+		</label>
+		</div>
+</script>
+
+<!-- Default -->
+<script type="text/ng-template" id="default_renderer.html">
+	<div class="function">
+			<button class="btn btn-danger btn-xs"
+			ng-click="removeAdvanceFunction($index,  node.edit.special)">X</button>
+			<label>DEFAULT</label><br/>
+			<label>Value:</label><input type="text" ng-model="item.default.value" class="form-control input-sm"/>
+		</div>
+</script>
+
+
+
+<!-- end special function control list -->
+
+<div class="row">
+	<h1>Mapping</h1>
+</div>
+<div class="row">
+	<h2>{{ mapping }}</h2>
+</div>
+<div class="row top10">
+	<div>
+		<button class="btn" ng-click="loadMapping()">LOAD</button>
+		<button class="btn" ng-click="saveMapping()">SAVE</button>
+    	<button class="btn" ng-click="saveasMapping()">SAVE AS</button>
+		<!--<button class="btn" ng-click="generateMapping()">GENERATE (BETA)</button>-->
+	</div>
+</div>
+<div class="row top10">
+	<div class="panel panel-default col-sm-6">
+		<div class="panel-heading">
+				
+			<table >
+				<tr>
+					<td><h3>Source</h3></td>
+					<td><select ng-model="toggle.source"
+						ng-init="source.toggle = 'PAYLOAD'"
+						ng-options="x for x in ['PAYLOAD','ATTRIBUTES']"
+						ng-change="typeSwitch()"
+						class="form-control input-sm"></td>
+					<td></select> <select ng-model="request.type"
+						ng-options="x for x in ['XML','JSON','MAP','CSV','FF']"
+						ng-change="typeSwitch()"
+						class="form-control input-sm">
+					</select>
+					</td>
+					<td>
+							<button class="btn btn-success btn-xs" ng-click="editSchema(sourceFF)" ng-show="request.type=='FF'">Schema</button>
+					</td>
+				</tr>
+			</table>
+			
+			
+			
+		</div>
+		<div class="panel-body" ng-show="toggle.source == 'PAYLOAD'">
+			<textarea id="TextArea" wrap="off" ng-class="textarea"
+				ng-model="request.payload" ng-blur="sourceChange()"
+				placeholder="Paste expected payload here"
+				style="width: 100%; min-width: 150px; min-height: 200px; font-size: 17px;"
+				class="form-control input-sm">
+			</textarea>
+		</div>
+		<div class="panel-body" ng-show="toggle.source == 'ATTRIBUTES'">
+			<div class="row top3">
+				<table>
+					<tr>
+						<th></th>
+						<th>
+							<label>Property</label>
+						</th>
+						<th>
+							<label>Value</label>
+						</th>
+					</tr>
+					<tr ng-repeat="property in request.payloadProperty">
+						<td><button class="btn btn-danger btn-xs"
+							ng-click="removePropertyItem($index)">X</button>
+						</td>
+							<td>
+									<input type="text" ng-model="property.key" class="form-control  input-sm"/> 
+							</td>
+							<td>
+									<input type="text" ng-model="property.value" class="form-control  input-sm"/>
+							</td>
+						</tr>
+				</table>
+				
+				
+			</div>
+			<div class="row top5">
+				<button class="btn btn-success btn-xs" ng-click="addPropertyItem()">+</button>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="panel panel-default col-sm-6">
+		<div class="panel-heading">
+			
+			<table>
+				<td><h3>Preview</h3></td>
+				<td>
+						<select ng-model="toggle.target"
+						ng-options="x for x in ['PAYLOAD','ATTRIBUTES']"
+						ng-change="typeSwitch()"
+						class="form-control  input-sm">
+				</td>
+				<td>
+					</select> <select ng-model="request.response"
+					ng-options="x for x in ['XML','JSON','MAP','CSV','FF']"
+					ng-change="typeSwitch()"
+					class="form-control  input-sm">
+				</select>
+				
+				</td>
+				<td>
+						<button class="btn btn-success btn-xs" ng-click="editSchema(targetFF)" ng-show="request.response=='FF'">Schema</button>
+				</td>
+			</table>
+			
+		</div>
+
+		<div class="panel-body" ng-show="toggle.target == 'PAYLOAD'">
+			<textarea readonly id="TextArea" wrap="off" ng-class="textarea"
+				ng-model="data"
+				style="width: 100%; min-width: 150px; min-height: 200px; font-size: 17px;"
+				class="form-control input-sm">
+			</textarea>
+		</div>
+		<div class="panel-body" ng-show="toggle.target == 'ATTRIBUTES'">
+			<div class="row top3" >
+			<table>
+					<tr>
+						<th>
+							<label>Property</label>
+						</th>
+						<th>
+							<label>Value</label>
+						</th>
+					</tr>
+					<tr ng-repeat="property in dataAttributes">
+							<td>
+									<input readonly type="text" ng-model="property.key" class="form-control input-sm"/> 
+							</td>
+							<td>
+									<input readonly type="text" ng-model="property.value" class="form-control input-sm"/>
+							</td>
+						</tr>
+				</table>
+				</div>
+		</div>
+	</div>
+</div>
+<div class="row top3">
+	<div class="panel panel-default col-sm-6">
+		<div class="panel-heading">
+			<b>Mapping</b> <select ng-model="toggle.mapping"
+				ng-options="x for x in ['PAYLOAD','ATTRIBUTES']"
+				ng-change="typeSwitch()"
+				class="form-control input-sm">
+			</select>
+		</div>
+		<div class="panel-body"
+			style="max-height: 400px; overflow-y: scroll; overflow-x: scroll;"
+			ng-show="toggle.mapping == 'PAYLOAD'">
+			<div class="row">
+				<label> <input type="checkbox" ng-model="tree.list" />List
+				</label> <label> <input type="text" ng-model="tree.value"
+					ng-show="tree.list" />
+				</label>
+			<button class="btn btn-xs" ng-show="tree.when.length == 0" 	ng-click="editCondition(tree)"	 >Create When</button>
+			<button class="btn btn-xs btn-success" ng-show="tree.when.length > 0" 	ng-click="editCondition(tree)"	 >Edit When</button>
+			
+			</div>
+			<div class="row" ng-show="request.type == 'CSV'">
+				Source Headers: <input type="checkbox"
+					ng-model="tree.source.header" />
+			</div>
+			<div class="row" ng-show="request.type == 'CSV'">
+				Source Surround Quotes: <input type="checkbox"
+					ng-model="tree.source.quotes" />
+			</div>
+			<div class="row" ng-show="request.type == 'CSV'">
+				Source Delimiter: <input type="text"
+					ng-model="tree.source.delimiter" />
+			</div>
+			<div class="row" ng-show="request.response == 'CSV'" >
+				Target Headers: <input type="checkbox"
+					ng-model="tree.target.header" />
+			</div>
+			<div class="row" ng-show="request.response == 'CSV'" >
+				Target Surround Quotes: <input type="checkbox"
+					ng-model="tree.target.quotes" />
+			</div>
+			<div class="row" ng-show="request.response == 'CSV'" >
+				Target Delimiter: <input type="text"
+					ng-model="tree.target.delimiter" />
+			</div>
+			<div ng-show="request.response == 'XML'" class="row">
+				<input type="text" ng-model="tree.name" />
+			</div>
+			<div class="row">
+				<ul style="list-style-type: none;">
+					<li ng-repeat="data in tree.nodes"
+						ng-include="'tree_item_renderer.html'"></li>
+					<li><button class="btn btn-success btn-xs"
+							ng-click="addChild(tree)">+</button></li>
+				</ul>
+			</div>
+		</div>
+		<div class="panel-body"
+			style="max-height: 400px; overflow-y: scroll; overflow-x: scroll;"
+			ng-show="toggle.mapping == 'ATTRIBUTES'">
+			<div class="row">
+				<ul style="list-style-type: none;">
+					<li ng-repeat="data in treeProperty.nodes"
+						ng-include="'tree_item_renderer.html'"></li>
+					<li><button class="btn btn-success btn-xs"
+							ng-click="addChild(treeProperty)">+</button></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+
+
+	<div class="panel panel-default col-sm-6" ng-show="node.edit">
+		<div class="panel-heading">
+			<b>{{node.edit.name}}</b>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<button class="btn" ng-click="saveNode(node.edit)">Done</button>
+				<button class="btn btn-danger" ng-click="deleteNode(node.edit)">Delete</button>
+			</div>
+			<div class="row">
+				<label> <input type="checkbox" ng-model="node.edit.list" />List
+				</label>
+			</div>
+			<div class="row">
+				<label> <input type="checkbox" ng-model="node.edit.required" />Required
+				</label>
+			</div>
+			<div class="row">
+				<label> <input type="checkbox" ng-model="node.edit.ignore" />Ignore
+				</label>
+			</div>
+			<div class="row">
+				TYPE: <select ng-model="node.edit.type" 
+					ng-options="x for x in ['SIMPLE','OBJECT','CUSTOM']" 
+					ng-change="updateNodeType(data)" class="form-control input-sm">
+				</select>
+			</div>
+			<div class="row top5" >
+					<button class="btn btn-xs" ng-show="node.edit.when.length == 0" 	ng-click="editCondition(node.edit)"	 >Create When</button>
+					<button class="btn btn-xs btn-success" ng-show="node.edit.when.length > 0" 	ng-click="editCondition(node.edit)"	 >Edit When</button>
+			</div>
+			<div class="row top5">Move:</div>
+			<div class="row">
+				<button class="btn" ng-click="nodeMoveOut()" class="btn btn-xs">OUT</button>
+				<button class="btn" ng-click="nodeMoveUp()" class="btn btn-xs">UP</button>
+				<button class="btn" ng-click="nodeMoveDown()" class="btn btn-xs">DOWN</button>
+				<button class="btn" ng-click="nodeMoveIn()" class="btn btn-xs">IN</button>
+			</div>
+			<div class="row top10" ng-show="node.edit.type=='CUSTOM'">
+					<textarea id="TextArea" wrap="off" ng-class="textarea"
+						ng-model="node.edit.script"
+						placeholder="Enter Groovy Script"
+						style="width: 100%; min-width: 150px; min-height: 200px; font-size: 17px;">
+				</textarea>
+			</div>
+			<div class="row top10" ng-show="node.edit.type!='CUSTOM'">List Function:</div>
+			<div class="row top5" ng-show="node.edit.type!='CUSTOM'">
+					<table >
+					<tr>
+						<td><select ng-model="advancepick"
+							ng-options="value as key for (key, value) in 
+						{'Concat List':'concatlist',
+						'Zip List':'ziplist',
+						'Unique Filter':'uniquefilter'
+						}" class="form-control input-sm"></select></td>
+						<td><button class="btn" ng-click="addListAdvanceFunction(node.edit, advancepick)">+</button></td>
+					</tr>
+				</table>
+			</div>
+				<div class="row top5"  ng-show="node.edit.type!='CUSTOM'" ng-repeat="item in node.edit.listspecial" >
+						<div ng-include="'ziplist_renderer.html'" ng-show="item.type=='ziplist'"></div>
+						<div ng-include="'concatlist_renderer.html'" ng-show="item.type=='concatlist'"></div>
+						<div ng-include="'uniquefilter_renderer.html'" ng-show="item.type=='uniquefilter'"></div>
+				</div>
+			<div class="row top10" ng-show="node.edit.type!='CUSTOM'">Per Item Function:</div>
+			<div class="row top5" ng-show="node.edit.type!='CUSTOM'">
+				<table>
+					<tr>
+						<td><select ng-model="advancepick"
+							ng-options="value as key for (key, value) in 
+						{'Abs':'abs',
+						'Trim':'trim',
+						'Advance Trim':'advancetrim',
+						'Qualifier':'qualifier',
+						'Datetime Formatting':'datetime',
+						'Number Formatting':'number',
+						'Cross Referencing':'xref',
+						'Pad':'padding',
+						'Substring':'substring',
+						'Concat':'concat',
+						'To String':'tostring',
+						'To Boolean':'toboolean',
+						'To Number':'tonumber',
+						'Sum List':'sum',
+						'Default':'default',
+						'Get First':'getfirst',
+						'Join By':'joinby'	
+						}" class="form-control input-sm"></select>
+						</td>
+						<td><button class="btn" ng-click="addAdvanceFunction(node.edit, advancepick)">+</button></td>
+					</tr>
+				</table>
+				
+			</div>
+			<div class="row top5"  ng-show="node.edit.type!='CUSTOM'" ng-repeat="item in node.edit.special" >
+				<div ng-include="'trim_renderer.html'" ng-show="item.type=='trim'"></div>
+				<div ng-include="'abs_renderer.html'" ng-show="item.type=='abs'"></div>
+				<div ng-include="'advancetrim_renderer.html'" ng-show="item.type=='advancetrim'"></div>
+				<div ng-include="'qualifier_renderer.html'" ng-show="item.type=='qualifier'"></div>
+				<div ng-include="'datetime_renderer.html'" ng-show="item.type=='datetime'"></div>
+				<div ng-include="'number_renderer.html'" ng-show="item.type=='number'"></div>
+				<div ng-include="'padding_renderer.html'" ng-show="item.type=='padding'"></div>
+				<div ng-include="'substring_renderer.html'" ng-show="item.type=='substring'"></div>
+				<div ng-include="'xref_renderer.html'" ng-show="item.type=='xref'"></div>
+				<div ng-include="'concat_renderer.html'" ng-show="item.type=='concat'"></div>
+				<div ng-include="'tonumber_renderer.html'" ng-show="item.type=='tonumber'"></div>
+				<div ng-include="'toboolean_renderer.html'" ng-show="item.type=='toboolean'"></div>
+				<div ng-include="'tostring_renderer.html'" ng-show="item.type=='tostring'"></div>
+				<div ng-include="'sum_renderer.html'" ng-show="item.type=='sum'"></div>
+				<div ng-include="'default_renderer.html'" ng-show="item.type=='default'"></div>
+				<div ng-include="'getfirst_renderer.html'" ng-show="item.type=='getfirst'"></div>
+				<div ng-include="'joinby_renderer.html'" ng-show="item.type=='joinby'"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- ng-show="subview" -->
+<div bn-modals ng-show="subview" ng-switch="subview" class="m-modals">
+
+	<form ng-switch-when="generator" ng-controller="loadMappingGenerator"
+		ng-submit="submit()" class="modals">
+		<div class="row">
+			<h2>Insert payload</h2>
+		</div>
+		<p ng-if="errorMessage">
+			<strong>Sorry:</strong> {{ errorMessage }}
+		</p>
+		<p>
+			<textarea id="TextArea" wrap="off" ng-class="textarea"
+				ng-model="payload" placeholder="Enter payload here"
+				style="width: 100%; min-width: 150px; min-height: 200px; font-size: 17px;">
+			</textarea>
+		</p>
+		<p>
+			<a ng-click="submit()">Generate</a> &mdash; <a ng-click="cancel()">Cancel</a>
+		</p>
+	</form>
+
+
+	<form ng-switch-when="load" ng-controller="loadMappingController"
+		ng-submit="submit()" class="modals">
+		<div class="row">
+			<h2>Select mapping to load</h2>
+		</div>
+		<p ng-if="errorMessage">
+			<strong>Sorry:</strong> {{ errorMessage }}
+		</p>
+		<p>
+			<select ng-model="mapping.name" ng-options="x for x in mappings"></select>
+		</p>
+		<p>
+			<a ng-click="submit()">Load</a> &mdash; <a ng-click="cancel()">Cancel</a>
+		</p>
+	</form>
+
+	<form ng-switch-when="save" ng-controller="saveMappingController"
+		ng-submit="submit()" class="modals">
+		<div class="row">
+			<h2>Select new mapping to save</h2>
+		</div>
+		<div class="row" ng-if="errorMessage">
+			<strong>Sorry:</strong> {{ errorMessage }}
+		</div>
+		<div class="row">
+			<select ng-model="mapping.name" ng-options="x for x in mappings"></select>
+		</div>
+		<div class="row">
+			<a ng-click="submit()">Save</a> &mdash; <a ng-click="cancel()">Cancel</a>
+		</div>
+	</form>
+	
+	<form ng-switch-when="ffschemalarge" 
+		ng-controller="editFFSchemaController"	
+		class="modals" style="width:800px; margin-left: -400px ;">
+		<div class="row">
+			<h2>Edit Schema</h2>
+		</div>
+		<div class="row" ng-if="errorMessage">
+			<strong>Sorry:</strong> {{ errorMessage }}
+		</div>
+		<div class="row" ng-include="'tree_schema_renderer.html'" 
+			style="max-height: 400px; overflow-y: scroll;"></div>
+		<div class="row">
+			<a ng-click="save()">Save</a> &mdash; <a ng-click="cancel()">Cancel</a>
+		</div>
+	</form>
+	
+	<form ng-switch-when="whenlarge" 
+		ng-controller="editWhenController"	
+		class="modals" style="width:800px; margin-left: -400px ;">
+		<div class="row">
+			<h2>Edit When Statement</h2>
+		</div>
+		<div class="row" ng-if="errorMessage">
+			<strong>Sorry:</strong> {{ errorMessage }}
+		</div>
+		<div class="row" ng-include="'when_renderer.html'" 
+		style="max-height: 400px; overflow-y: scroll;"></div>
+		<div class="row">
+			<a ng-click="save()">Save</a> &mdash; <a ng-click="cancel()">Cancel</a>
+		</div>
+	</form>
+	
+</div>
+
+
+

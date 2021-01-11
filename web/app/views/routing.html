@@ -1,0 +1,72 @@
+<div class="row">
+ <h1>Routing</h1>
+</div>
+<div class="row">
+	<h2>{{ routing.name }}</h2>
+</div>		
+<div class="row top10">
+	<div> 
+		
+			<button class="btn" ng-click="loadRouting()" >LOAD</button>
+			<button class="btn" ng-click="saveRouting()" >SAVE</button>
+			<button class="btn" ng-click="saveasRouting()" >SAVE AS</button>
+		
+	</div>
+</div>	
+<div class="row">
+	
+			<div class="row top10" >
+				Type: <select ng-model="routings.type" 
+				ng-options="x for x in ['http','activemq','storagequeue','blobstorage']"
+				ng-change="typeSwitch()" ></select>
+				</div>
+			<div class="row top5" ng-repeat="item in routings.list">
+				<button class="btn btn-danger btn-xs" ng-click="removeItem($index)">X</button>
+				<input type="text" ng-model="item.key"/>=
+				<input ng-hide="item.encrypt" type="text" ng-model="item.value"/>
+				<input ng-show="item.encrypt" type="password" ng-model="item.value"/>
+				<input type="checkbox" ng-model="item.encrypt">Encrypt</input>
+			</div>
+			<div class="row">
+				<button class="btn btn-success btn-xs" ng-click="addItem()">+</button>
+			</div>
+</div>	
+
+
+<!-- ng-show="subview" -->
+<div bn-modals ng-show="subview" ng-switch="subview" class="m-modals" >
+        <form ng-switch-when="load" 
+        	ng-controller="loadRoutingController" 
+        	ng-submit="submit()" 
+        	class="modals">
+            <div class="row"><h2>Select routing to load</h2></div>
+            <p ng-if="errorMessage"><strong>Sorry:</strong> {{ errorMessage }}</p>
+            <p>
+                <select ng-model="route.name" 
+					ng-options="x for x in routings" ></select>
+            </p>
+            <p>
+                <a ng-click="submit()">Load</a>
+                &mdash;
+                <a ng-click="cancel()">Cancel</a>
+            </p>
+        </form>
+        
+        <form
+            ng-switch-when="save"
+            ng-controller="saveRoutingController"
+            ng-submit="submit()"
+            class="modals">
+            <div class="row"><h2>Select new routing to save</h2></div>
+            <div class="row" ng-if="errorMessage"><strong>Sorry:</strong> {{ errorMessage }}</div>
+            <div class="row">
+                <select ng-model="route.name" 
+					ng-options="x for x in routings" ></select>
+            </div>
+            <div class="row">
+                <a ng-click="submit()">Save</a>
+                &mdash;
+                <a ng-click="cancel()">Cancel</a>
+            </div>
+        </form>
+    </div>

@@ -1,0 +1,115 @@
+{
+    "$schema": "http://json.schemastore.org/proxies",
+    "proxies": {
+        "query-transactions": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/list"
+            },
+            "backendUri": "http://localhost/api/Logger-Extract"
+        },
+        "query-events": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/eventcount"
+            },
+            "backendUri": "http://localhost/api/Event-Count-Extract"
+        },
+        "query-transaction": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/transaction"
+            },
+            "backendUri": "http://localhost/api/Logger-Extract-Transaction"
+        },
+        "query-transaction-attribute": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/attributesearch"
+            },
+            "backendUri": "http://localhost/api/Logger-Extract-Transaction-Attribute"
+        },
+        "reprocess-transactions": {
+
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/transactions/reprocess"
+            },
+            "backendUri": "http://localhost/api/Reprocess-Job"
+        },
+        "reprocess-find-source": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/transactions/findsource"
+            },
+            "backendUri": "http://localhost/api/Find-Source-Event"
+        },
+        "get-transaction": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/payload"
+            },
+            "backendUri": "http://localhost/api/Get-Payload"
+        },
+        "query-transactions-short": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/list"
+            },
+            "backendUri": "http://localhost/api/Logger-Extract"
+        },
+        "query-events-short": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/eventcount"
+            },
+            "backendUri": "http://localhost/api/Event-Count-Extract"
+        },
+        "query-transaction-short": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transaction"
+            },
+            "backendUri": "http://localhost/api/Logger-Extract-Transaction"
+        },
+        "query-transaction-attribute-short": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/attributesearch"
+            },
+            "backendUri": "http://localhost/api/Logger-Extract-Transaction-Attribute"
+        },
+        "reprocess-transactions-short": {
+
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/reprocess"
+            },
+            "backendUri": "http://localhost/api/Reprocess-Job"
+        },
+        "reprocess-find-source-short": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/findsource"
+            },
+            "backendUri": "http://localhost/api/Find-Source-Event"
+        },
+        "get-transaction-short": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/payload"
+            },
+            "backendUri": "http://localhost/api/Get-Payload"
+        }
+        
+    }
+  }
+  

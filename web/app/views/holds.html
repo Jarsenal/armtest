@@ -1,0 +1,41 @@
+<div class="row">
+ <h1>Batches</h1>
+</div>
+<div class="row top10">
+			<button class="btn" ng-click="loadData()" >LOAD</button>
+			<!-- <button class="btn btn-danger" ng-click="deleteHolds()" >DELETE</button> -->
+	
+	</div>
+</div>	
+<div class="row top10">
+<h3>Holds</h3>
+<table class="table table-bordered">
+		<tr>
+			<th>Event</th>
+			<th>Transaction</th>
+			<th>Batch</th>
+		</tr>
+		<tr ng-repeat="hold in holds">
+			<td>{{hold.event}}</td>
+			<td>{{hold.transaction}}</td>
+			<td>{{hold.batch}}</td>
+		</tr>
+	</table>
+	
+</div>
+
+<div class="row top10">
+<h3>Retries</h3>
+<table class="table table-bordered">
+		<tr>
+			<th>Event</th>
+			<th>Transaction</th>
+			<th>Batch</th>
+		</tr>
+		<tr ng-repeat="retry in retries">
+			<td>{{retry.event}}</td>
+			<td>{{retry.transaction}}</td>
+			<td>{{retry.batch}}</td>
+		</tr>
+	</table>
+</div>

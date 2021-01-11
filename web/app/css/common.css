@@ -1,0 +1,162 @@
+.top2 { margin-top:2px; }
+.top5 { margin-top:5px; }
+.top7 { margin-top:7px; }
+.top10 { margin-top:10px; }
+.top15 { margin-top:15px; }
+.top17 { margin-top:17px; }
+.top30 { margin-top:30px; }
+
+.function {
+	border-top: 3px dotted gray;
+	padding: 5px;
+}
+
+.container-fluid {
+    background-color:#fe001a;
+}
+
+.navbar-header {
+	background-color:#fe001a;
+}
+
+.navbar {
+    background-color: #CC0000;
+    border-color: #AA0000;
+    border-radius: 0;
+}
+
+.navbar .navbar-brand,
+.navbar .navbar-brand:hover,
+.navbar .navbar-brand:focus {
+    color: #FFF;
+}
+
+.navbar .navbar-nav > li > a {
+    color: #FFF;
+}
+
+.navbar .navbar-nav > li > a:hover,
+.navbar .navbar-nav > li > a:focus {
+    background-color: #AA0000;
+}
+
+
+a[ ng-click ] {
+	color: red ;
+	cursor: pointer ;
+	text-decoration: underline ;
+}
+
+div.m-modals {
+	background-color: rgba( 0, 0, 0, 0.8 ) ;
+	bottom: 0px ;
+	left: 0px ;
+	position: fixed ;
+	right: 0px ;
+	top: 0px ;
+}
+
+
+
+
+div.m-modals.ng-hide-add.ng-hide-add-active,
+div.m-modals.ng-hide-remove.ng-hide-remove-active {
+	transition: 250ms ease all ;
+	z-index: 500;
+}
+
+div.m-modals > .modals {
+	background-color: #FAFAFA ;
+	border-radius: 3px 3px 3px 3px ;
+	box-sizing: border-box ;
+		-moz-box-sizing: border-box ;
+	padding: 20px 20px 20px 20px ;
+	position: fixed ;
+	left: 50% ;
+	margin-left: -200px ;
+	top: 60px ;
+	width: 400px ;
+	z-index: 500;
+}
+
+
+div.m-modals.ng-hide {
+	background-color: rgba( 0, 0, 0, 0 );
+}
+
+div.m-modals.ng-hide > .modals.ng-enter {
+	top: -200px ;
+	transition: 250ms ease top ;
+}
+
+div.m-modals.ng-hide > .modals.ng-enter.ng-enter-active {
+	top: 200px ;
+}
+
+
+
+
+
+div.m-modals-parent.ng-hide-add.ng-hide-add-active,
+div.m-modals-parent.ng-hide-remove.ng-hide-remove-active {
+	transition: 250ms ease all ;
+	z-index: 500;
+}
+
+div.m-modals-parent > .modals-parent {
+	background-color: #FAFAFA ;
+	border-radius: 3px 3px 3px 3px ;
+	box-sizing: border-box ;
+		-moz-box-sizing: border-box ;
+	padding: 20px 20px 20px 20px ;
+	position: fixed ;
+	left: 50% ;
+	margin-left: -200px ;
+	top: 60px ;
+	width: 400px ;
+	z-index: 500;
+}
+
+
+div.m-modals-parent.ng-hide {
+	background-color: rgba( 0, 0, 0, 0 );
+}
+
+div.m-modals-parent.ng-hide > .modals.ng-enter {
+	top: -200px ;
+	transition: 250ms ease top ;
+}
+
+div.m-modals.ng-hide > .modals.ng-enter.ng-enter-active {
+	top: 200px ;
+}
+
+a.jump {
+	color: #999999 ;
+}
+
+a.jump:hover {
+	background-color: gold ;
+	color: #000000 ;
+}
+
+.loader {
+	border: 16px solid #f3f3f3;
+	border-radius: 50%;
+	border-top: 16px solid #3498db;
+	width: 40px;
+	height: 40px;
+	-webkit-animation: spin 2s linear infinite; /* Safari */
+	animation: spin 2s linear infinite;
+  }
+  
+  /* Safari */
+  @-webkit-keyframes spin {
+	0% { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+  }

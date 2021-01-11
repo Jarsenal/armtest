@@ -1,0 +1,14 @@
+<div class="row">
+ <h1>Schedule to Events</h1>
+</div>
+<div class="row top10">
+		<button class="btn" ng-click="saveConfiguration()" >SAVE</button>
+</div>	
+<div class="row">
+	<div class="row" ng-repeat="item in schedules">
+		{{item.schedule}} =
+		<input type="text" ng-model="item.events"/>
+	</div>
+</div>	
+
+

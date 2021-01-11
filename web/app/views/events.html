@@ -1,0 +1,146 @@
+
+<script type="text/ng-template" id="when_renderer.html">
+	<div class="row top10" style="border-left: 2px solid gray" ng-init="parent = node">
+		<ul ng-repeat="node in node.nodes" style="list-style-type: none">
+			<li><button class="btn btn-danger btn-xs" ng-click="removeRecord(parent.nodes, $index)">Remove Definition</button></li>
+			<li>Logic:
+					<select ng-model="node.action"
+					ng-options="x for x in 
+					['AND','OR','NOT AND','NOT OR','STATEMENT']" ></select></li>
+			<li ng-hide="node.action == 'STATEMENT'">Loop: <input type="text" ng-model="node.loop" /> </li>
+			<li ng-show="node.action == 'STATEMENT'">
+				<div class="row top5">
+						<select ng-model="node.type"
+						ng-options="x for x in 
+						['STRING','NUMBER','DATETIME']" />
+				</div>
+				<div class="row top5">
+					<input type="text" ng-model="node.left" placeholder="Left Operand" />
+					<input ng-show="node.type=='DATETIME'"  
+					type="text" 
+					ng-model="node.leftDateFormat" 
+					placeholder="Datetime Format yyyyMMdd'T'HHmmss.SSSZZZZ"  />
+				</div>
+				<div class="row">
+					Operation:
+					<select ng-model="node.op"
+					ng-options="x for x in 
+					['EQUALS','NOT EQUALS',
+					'LESS THAN', 'GREATER THAN',
+					'LESS THAN OR EQUAL','GREATER THAN OR EQUAL',
+					'CONTAINS','DOES NOT CONTAIN','IS NULL','IS NOT NULL']" ></select>
+				</div>
+				<div class="row" ng-hide="node.op == 'IS NULL' or node.op == 'IS NOT NULL'">
+					<input type="text" 
+					ng-model="node.right" 
+					placeholder="Right Operand"  />
+					<input ng-show="node.type=='DATETIME'"  
+					type="text" 
+					ng-model="node.rightDateFormat" 
+					placeholder="Datetime Format yyyyMMdd'T'HHmmss.SSSZZZZ"  />
+				</div>
+			</li>
+			<li ng-hide="node.action == 'STATEMENT'">
+				<div class="row" ng-include="'when_renderer.html'" ></div>
+			</li>
+		</ul>
+	</div>
+	<button class="btn btn-success btn-xs" ng-click="addRecord(node.nodes)">Add Condition</button>
+	</script>
+	
+
+<div class="row">
+ <h1>Events</h1>
+</div>
+<div class="row top10">
+	<div>
+		<button class="btn" ng-click="loadEvents()" >LOAD</button>
+		<button class="btn" ng-click="saveEvents()" >SAVE</button>
+		
+	</div>
+</div>	
+<div class="row top10">
+	<div class="row" ng-repeat="event in events">
+		<div class="row" ng-show="event.edit">
+			<button class="btn btn-danger btn-xs" ng-click="removeEvent($index)">X</button>
+			<input type="text" ng-model="event.name" />
+		</div>
+		<div  ng-show="event.edit">
+			Type:
+			<select ng-model="event.type" ng-options="y for y in ['XML','JSON','CSV','FF']"></select>
+		</div>
+		<div class="row" ng-show="event.edit">
+			- Override with - 
+			</div>
+		<div class="row" ng-show="event.edit" ng-repeat="change in event.changes">
+			<button class="btn btn-danger btn-xs" ng-click="removeChange(event,$index)">X</button>
+			{{change.name}}
+			<button class="btn btn-xs" ng-show="change.when.length == 0" 	ng-click="editCondition(change)"	 >Create When</button>
+			<button class="btn btn-xs btn-success" ng-show="change.when.length > 0" 	ng-click="editCondition(change)"	 >Edit When</button>
+		</div>
+		<div class="row" ng-show="event.edit">
+			<select ng-model="chgevent" ng-options="x for x in eventList"></select>
+			<button ng-hide="event.type=='source'" ng-click="addChange(chgevent, $index)">+</button>
+		</div>
+		<div class="row" ng-show="event.edit">
+				- Duplicate for - 
+			   </div>
+		<div class="row" ng-show="event.edit" ng-repeat="duplicate in event.duplicates">
+		 	<button class="btn btn-danger btn-xs" ng-click="removeDuplicate(event,$index)">X</button>
+			{{duplicate.name}}
+			<button class="btn btn-xs" ng-show="duplicate.when.length == 0" 	ng-click="editCondition(duplicate)"	 >Create When</button>
+			<button class="btn btn-xs btn-success" ng-show="duplicate.when.length > 0" 	ng-click="editCondition(duplicate)"	 >Edit When</button>
+		</div>
+		<div class="row" ng-show="event.edit">
+			<select ng-model="dupevent" ng-options="x for x in eventList"></select>
+			<button ng-hide="event.type=='source'" ng-click="addDuplicate(dupevent, $index)">+</button>
+		</div>
+		<div class="row" ng-show="event.edit">
+				- Follows after Completion - 
+			   </div>
+		<div class="row" ng-show="event.edit" ng-repeat="follow in event.follows">
+		 	<button class="btn btn-danger btn-xs" ng-click="removeFollow(event,$index)">X</button>
+			{{follow}}
+		</div>
+		<div class="row" ng-show="event.edit">
+			<select ng-model="folevent" ng-options="x for x in eventList"></select>
+			<button ng-hide="event.type=='source'" ng-click="addFollow(folevent, $index)">+</button>
+		</div>
+		<div class="row" ng-show="event.edit">
+		 - Error Events - 
+		</div>
+		 <div class="row" ng-show="event.edit" ng-repeat="error in event.errors">
+			<button class="btn btn-danger btn-xs" ng-click="removeError(event,$index)">X</button>
+			{{error}}
+		</div>
+		<div class="row" ng-show="event.edit">
+			<select ng-model="errevent" ng-options="x for x in eventList"></select>
+			<button ng-hide="event.type=='source'" ng-click="addError(errevent, $index)">+</button>
+		</div>
+		<div ng-hide="event.edit" ng-click="editEvent($index)" >{{event.name}}</div>
+	</div>
+	<div class="row">
+		<button class="btn btn-success btn-xs" ng-click="addEvent()">+</button>
+	</div>	
+</div>
+
+<!-- ng-show="subview" -->
+<div bn-modals ng-show="subview" ng-switch="subview" class="m-modals">
+	<form ng-switch-when="whenlarge" 
+		ng-controller="editEventWhenController"	
+		class="modals" style="width:800px; margin-left: -400px ;">
+		<div class="row">
+			<h2>Edit When Statement</h2>
+		</div>
+		<div class="row" ng-if="errorMessage">
+			<strong>Sorry:</strong> {{ errorMessage }}
+		</div>
+		<div class="row" ng-include="'when_renderer.html'" 
+		style="max-height: 400px; overflow-y: scroll;"></div>
+		<div class="row">
+			<a ng-click="save()">Save</a> &mdash; <a ng-click="cancel()">Cancel</a>
+		</div>
+	</form>
+</div>
+
+

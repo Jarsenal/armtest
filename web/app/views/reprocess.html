@@ -1,0 +1,42 @@
+<div class="row">
+ <h1>Reprocess</h1>
+</div>
+<div class="row top10">
+	<div>
+		
+		<button class="btn" ng-click="loadEvents()" >LOAD</button>
+		
+	</div>
+</div>	
+<div class="row top10">
+	<div ng-repeat="event in events" class="row">
+	    <hr/>
+		<div class="row">
+			<h5><button class="btn btn-success btn-xs" ng-click="loadTransaction($index)" >Expand</button>
+			{{event.name}}</h5>
+		</div>
+		<div class="row top5" ng-repeat="transaction in event.transactions">
+		   <div><button class="btn btn-danger btn-xs" ng-click="runTransaction(event.name, transaction.id)" >Reprocess</button>
+			{{transaction.id}} -- {{transaction.modified}}</div>
+		</div>
+	</div>
+</div>
+<div bn-modals ng-show="subview" ng-switch="subview" class="m-modals" >
+
+<form ng-switch-when="reprocess" 
+        	ng-controller="reprocessTransactionController" 
+        	ng-submit="submit()" 
+        	class="modals">
+            <div class="row"><h2>Reprocess trasaction?</h2></div>
+            <p ng-if="errorMessage"><strong>Sorry:</strong> {{ errorMessage }}</p>
+            <p>
+               <div class="row">Event: {{transaction.event}}</div>
+               <div class="row">Transaction: {{transaction.id}}</div>
+            </p>
+            <p>
+                <a ng-click="submit()">Reprocess</a>
+                &mdash;
+                <a ng-click="cancel()">Cancel</a>
+            </p>
+        </form>
+        </div>

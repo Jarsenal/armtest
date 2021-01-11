@@ -1,0 +1,37 @@
+<div class="row">
+ <h1>Queue to Event</h1>
+</div>
+<div class="row top10">
+	<button class="btn" ng-click="loadFile()" >LOAD</button>
+	<button class="btn" ng-click="saveFile()" >SAVE</button>
+</div>	
+<div class="row top10">
+	<table>
+		<tr>
+			<th></th>
+			<th>Queue Name</th>
+			<th>Event Name</th>
+		</tr>
+		<tr ng-repeat="item in events">
+			<td>
+					<button  class="btn btn-danger btn-xs" ng-click="removeItem($index)">X</button>
+			</td>
+			<td>
+					<input type="text" ng-model="item.key" class="form-control"/>
+			</td>
+			<td>
+					<select ng-model="item.event" 
+					ng-options="x for x in eventlist" class="form-control"></select>
+			</td>
+			<td>
+				<select ng-model="item.type" 
+				ng-options="x for x in ['critical', 'rapid','batch','sequenced']" class="form-control"></select>
+			</td>
+		</tr>
+		<tr>
+			<td><button class="btn btn-success btn-xs" ng-click="addItem()">+</button></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+</div>	

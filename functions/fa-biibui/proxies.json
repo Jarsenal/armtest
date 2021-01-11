@@ -1,0 +1,181 @@
+{
+    "$schema": "http://json.schemastore.org/proxies",
+    "proxies": {
+        "get-events": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/configs/events"
+            },
+            "backendUri": "http://localhost/api/EventsConfigRetrieve"
+        },
+        "post-events": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/configs/events"
+            },
+            "backendUri": "http://localhost/api/EventsConfigStore"
+        },
+        "get-mqevents": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/configs/mqevents"
+            },
+            "backendUri": "http://localhost/api/MQEventsConfigRetrieve"
+        },
+        "post-mqevents": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/configs/mqevents"
+            },
+            "backendUri": "http://localhost/api/MQEventsConfigStore"
+        },
+        "get-mappings": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/configs/mappings/{event}"
+            },
+            "backendUri": "http://localhost/api/MappingConfigRetrieve?event={event}"
+        },
+        "post-mappings": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/configs/mappings/{event}"
+            },
+            "backendUri": "http://localhost/api/MappingConfigStore?event={event}"
+        },
+        "get-routings": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/configs/routings/{event}"
+            },
+            "backendUri": "http://localhost/api/RoutingConfigRetrieve?event={event}"
+        },
+        "post-routings": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/configs/routings/{event}"
+            },
+            "backendUri": "http://localhost/api/RoutingConfigStore?event={event}"
+        },
+        "get-events-short": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/events"
+            },
+            "backendUri": "http://localhost/api/EventsConfigRetrieve"
+        },
+        "post-events-short": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/events"
+            },
+            "backendUri": "http://localhost/api/EventsConfigStore"
+        },
+        "get-mqevents-short": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/mqevents"
+            },
+            "backendUri": "http://localhost/api/MQEventsConfigRetrieve"
+        },
+        "post-mqevents-short": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/mqevents"
+            },
+            "backendUri": "http://localhost/api/MQEventsConfigStore"
+        },
+        "get-mappings-short": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/mappings/{event}"
+            },
+            "backendUri": "http://localhost/api/MappingConfigRetrieve?event={event}"
+        },
+        "post-mappings-short": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/mappings/{event}"
+            },
+            "backendUri": "http://localhost/api/MappingConfigStore?event={event}"
+        },
+        "get-routings-short": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/routings/{event}"
+            },
+            "backendUri": "http://localhost/api/RoutingConfigRetrieve?event={event}"
+        },
+        "post-routings-short": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/routings/{event}"
+            },
+            "backendUri": "http://localhost/api/RoutingConfigStore?event={event}"
+        },
+        "query-transactions": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/list"
+            },
+            "backendUri": "%TRANSACTION_URL%/api/Logger-Extract"
+        },
+        "query-events": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/eventcount"
+            },
+            "backendUri": "%TRANSACTION_URL%/api/Event-Count-Extract"
+        },
+        "query-transaction": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/transaction"
+            },
+            "backendUri": "%TRANSACTION_URL%/api/Logger-Extract-Transaction"
+        },
+        "reprocess-transactions": {
+
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/transactions/reprocess"
+            },
+            "backendUri": "%TRANSACTION_URL%/api/Reprocess-Job"
+        },
+        "reprocess-find-source": {
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/transactions/findsource"
+            },
+            "backendUri": "%TRANSACTION_URL%/api/Find-Source-Event"
+        },
+        "get-transaction": {
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/payload"
+            },
+            "backendUri": "%TRANSACTION_URL%/api/Get-Payload"
+        },
+        "query-transaction-attribute": {
+
+            "matchCondition": {
+                "methods": [ "GET" ],
+                "route": "/api/transactions/attributesearch"
+            },
+            "backendUri": "%TRANSACTION_URL%/api/Logger-Extract-Transaction-Attribute"
+        },
+        "mapping-test": {
+
+            "matchCondition": {
+                "methods": [ "POST" ],
+                "route": "/api/process/mappings"
+            },
+            "backendUri": "%MAPPING_URL%/api/RunMappingTest"
+        }
+      
+    }
+  }
+  
